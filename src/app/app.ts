@@ -1,9 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { PrevisioneGuadagno } from './components/previsione-guadagno/previsione-guadagno';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [PrevisioneGuadagno],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

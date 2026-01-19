@@ -1,0 +1,216 @@
+<form (ngSubmit)="calcola()" #form="ngForm">
+
+  <!-- DATI GENERALI -->
+  <fieldset>
+    <legend>Dati appartamento</legend>
+
+    <label>
+      Nome appartamento
+      <input
+        type="text"
+        name="nomeAppartamento"
+        [(ngModel)]="previsione.nomeAppartamento"
+        required
+      />
+    </label>
+
+    <label>
+      Indirizzo
+      <input
+        type="text"
+        name="indirizzo"
+        [(ngModel)]="previsione.indirizzo"
+        required
+      />
+    </label>
+
+    <label>
+      Numero locali
+      <input
+        type="number"
+        name="numeroLocali"
+        [(ngModel)]="previsione.numeroLocali"
+        min="0"
+      />
+    </label>
+
+    <label>
+      Numero bagni
+      <input
+        type="number"
+        name="numeroBagni"
+        [(ngModel)]="previsione.numeroBagni"
+        min="0"
+      />
+    </label>
+  </fieldset>
+
+  <!-- COSTI FISSI -->
+  <fieldset>
+    <legend>Costi fissi</legend>
+
+    <label>
+      Mutuo / Affitto mensile (€)
+      <input
+        type="number"
+        name="mutuoAffitto"
+        [(ngModel)]="previsione.mutuoAffitto"
+        min="0"
+      />
+    </label>
+
+    <label>
+      Utenze mensili (€)
+      <input
+        type="number"
+        name="costoUtenzeMensili"
+        [(ngModel)]="previsione.costoUtenzeMensili"
+        min="0"
+      />
+    </label>
+
+    <label>
+      Costo pulizia per soggiorno (€)
+      <input
+        type="number"
+        name="costoPulizia"
+        [(ngModel)]="previsione.costoPulizia"
+        min="0"
+      />
+    </label>
+  </fieldset>
+
+  <!-- PRENOTAZIONI -->
+  <fieldset>
+    <legend>Prenotazioni</legend>
+
+    <label>
+      Numero prenotazioni mensili
+      <input
+        type="number"
+        name="numeroPrenotazioni"
+        [(ngModel)]="previsione.numeroPrenotazioni"
+        min="0"
+      />
+    </label>
+
+    <label>
+      Notti mensili totali
+      <input
+        type="number"
+        name="numeroNottiMensili"
+        [(ngModel)]="previsione.numeroNottiMensili"
+        min="0"
+      />
+    </label>
+
+    <label>
+      Prezzo medio per notte (€)
+      <input
+        type="number"
+        name="prezzoMedioPerNotte"
+        [(ngModel)]="previsione.prezzoMedioPerNotte"
+        min="0"
+      />
+    </label>
+  </fieldset>
+
+  <!-- GESTIONE -->
+  <fieldset>
+    <legend>Gestione</legend>
+
+    <label>
+      Tipo gestione
+      <select
+        name="tipoGestione"
+        [(ngModel)]="previsione.tipoGestione">
+        <option value="">Seleziona</option>
+        <option value="diretta">Diretta</option>
+        <option value="cohost">Co-host</option>
+        <option value="agenzia">Agenzia</option>
+      </select>
+    </label>
+
+    <label>
+      Appartamento gestito direttamente
+      <input
+        type="checkbox"
+        name="appartamentoDiretto"
+        [(ngModel)]="previsione.appartamentoDiretto"
+      />
+    </label>
+
+    <label>
+      Commissione Host (€)
+      <input
+        type="number"
+        name="commissioneHost"
+        [(ngModel)]="previsione.commissioneHost"
+        min="0"
+      />
+    </label>
+
+    <label>
+      Commissione Co-Host (€)
+      <input
+        type="number"
+        name="commissioneCoHost"
+        [(ngModel)]="previsione.commissioneCoHost"
+        min="0"
+      />
+    </label>
+
+    <label>
+      Commissione totale gestione (€)
+      <input
+        type="number"
+        name="commissioneGestioneTotale"
+        [(ngModel)]="previsione.commissioneGestioneTotale"
+        min="0"
+      />
+    </label>
+  </fieldset>
+
+  <!-- TASSE E PIATTAFORMA -->
+  <fieldset>
+    <legend>Tasse e piattaforma</legend>
+
+    <label>
+      Costi tasse (€)
+      <input
+        type="number"
+        name="costoTasse"
+        [(ngModel)]="previsione.costoTasse"
+        min="0"
+      />
+    </label>
+
+    <label>
+      Costi piattaforma (€)
+      <input
+        type="number"
+        name="costoPiattaforma"
+        [(ngModel)]="previsione.costoPiattaforma"
+        min="0"
+      />
+    </label>
+  </fieldset>
+
+  <button type="submit" [disabled]="form.invalid">
+    Calcola previsione
+  </button>
+
+</form>
+
+<!-- RISULTATI -->
+<section *ngIf="risultato">
+  <h2>Risultati previsione</h2>
+
+  <p>Lordo pernottamenti: {{ risultato.totaleLordoPernottamenti }} €</p>
+  <p>Costo pulizie: {{ risultato.totaleCostoPulizia}} €</p>
+  <p>Costo tasse: {{ risultato.costoTasse }} €</p>
+  <p>Costo piattaforma: {{ risultato.costoPiattaforma }} €</p>
+
+  <p><strong>Netto proprietaria: {{ risultato.totaleNettoProprietario }} €</strong></p>
+</section>
+
