@@ -18,7 +18,7 @@ export class PrevisioneGuadagnoDto {
   commissioneCoHost = 0;
   commissioneHost = 0;
 
-  totaleCostoTasse?: number;
+  totaleCostoTassa?: number;
   totaleCostoPiattaforma?: number;
   totaleLordoPernottamenti?: number;
   totaleLordoGestione?: number;
