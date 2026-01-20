@@ -1,219 +1,431 @@
-<form (ngSubmit)="calcola()" #form="ngForm">
+<!-- FORM: mostrato solo se NON ho risultato -->
+@if (!risultato) {
+  <mat-card class="page">
+    <mat-card-header>
+      <mat-card-title>Previsione guadagno</mat-card-title>
+      <mat-card-subtitle>Affitti brevi — inserisci i dati e calcola il netto</mat-card-subtitle>
+    </mat-card-header>
 
-  <!-- DATI GENERALI -->
-  <fieldset>
-    <legend>Dati appartamento</legend>
+    <mat-card-content>
+      <form (ngSubmit)="calcola()" #form="ngForm" class="layout">
 
-    <label>
-      Nome appartamento
-      <input
-        type="text"
-        name="nomeAppartamento"
-        [(ngModel)]="previsione.nomeAppartamento"
-        required
-      />
-    </label>
+        @if (loading) {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
 
-    <label>
-      Indirizzo
-      <input
-        type="text"
-        name="indirizzo"
-        [(ngModel)]="previsione.indirizzo"
-        required
-      />
-    </label>
+        @if (errorMessage) {
+          <div class="error">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
 
-    <label>
-      Numero locali
-      <input
-        type="number"
-        name="numeroLocali"
-        [(ngModel)]="previsione.numeroLocali"
-        min="0"
-      />
-    </label>
+        <!-- COLONNE -->
+        <div class="cols">
 
-    <label>
-      Numero bagni
-      <input
-        type="number"
-        name="numeroBagni"
-        [(ngModel)]="previsione.numeroBagni"
-        min="0"
-      />
-    </label>
-  </fieldset>
+          <!-- COLONNA SINISTRA -->
+          <div class="col">
 
-  <!-- COSTI FISSI -->
-  <fieldset>
-    <legend>Costi fissi</legend>
+            <mat-card class="subcard">
+              <mat-card-title class="subcard-title">Dati appartamento</mat-card-title>
 
-    <label>
-      Mutuo / Affitto mensile (€)
-      <input
-        type="number"
-        name="mutuoAffitto"
-        [(ngModel)]="previsione.mutuoAffitto"
-        min="0"
-      />
-    </label>
+              <div class="grid-2">
+                <mat-form-field appearance="outline" class="col-2">
+                  <mat-label>Nome appartamento</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    name="nomeAppartamento"
+                    [(ngModel)]="previsione.nomeAppartamento"
+                    required
+                    #nomeAppartamento="ngModel"
+                  />
+                  @if ((nomeAppartamento.invalid && (nomeAppartamento.touched || form.submitted))) {
+                    <mat-error>Campo obbligatorio</mat-error>
+                  }
+                </mat-form-field>
 
-    <label>
-      Utenze mensili (€)
-      <input
-        type="number"
-        name="costoUtenzeMensili"
-        [(ngModel)]="previsione.costoUtenzeMensili"
-        min="0"
-      />
-    </label>
+                <mat-form-field appearance="outline" class="col-2">
+                  <mat-label>Indirizzo</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    name="indirizzo"
+                    [(ngModel)]="previsione.indirizzo"
+                    required
+                    #indirizzo="ngModel"
+                  />
+                  @if ((indirizzo.invalid && (indirizzo.touched || form.submitted))) {
+                    <mat-error>Campo obbligatorio</mat-error>
+                  }
+                </mat-form-field>
 
-    <label>
-      Costo pulizia per soggiorno (€)
-      <input
-        type="number"
-        name="costoPulizia"
-        [(ngModel)]="previsione.costoPulizia"
-        min="0"
-      />
-    </label>
-  </fieldset>
+                <mat-form-field appearance="outline">
+                  <mat-label>Numero locali</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    name="numeroLocali"
+                    [(ngModel)]="previsione.numeroLocali"
+                    required
+                    min="1"
+                    step="1"
+                    #numeroLocali="ngModel"
+                  />
+                  @if ((numeroLocali.invalid && (numeroLocali.touched || form.submitted))) {
+                    <mat-error>Deve essere almeno 1</mat-error>
+                  }
+                </mat-form-field>
 
-  <!-- PRENOTAZIONI -->
-  <fieldset>
-    <legend>Prenotazioni</legend>
+                <mat-form-field appearance="outline">
+                  <mat-label>Numero bagni</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    name="numeroBagni"
+                    [(ngModel)]="previsione.numeroBagni"
+                    required
+                    min="1"
+                    step="1"
+                    #numeroBagni="ngModel"
+                  />
+                  @if ((numeroBagni.invalid && (numeroBagni.touched || form.submitted))) {
+                    <mat-error>Deve essere almeno 1</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </mat-card>
 
-    <label>
-      Numero prenotazioni mensili
-      <input
-        type="number"
-        name="numeroPrenotazioni"
-        [(ngModel)]="previsione.numeroPrenotazioni"
-        min="0"
-      />
-    </label>
+            <mat-card class="subcard">
+              <mat-card-title class="subcard-title">Prenotazioni</mat-card-title>
 
-    <label>
-      Notti mensili totali
-      <input
-        type="number"
-        name="numeroNottiMensili"
-        [(ngModel)]="previsione.numeroNottiMensili"
-        min="0"
-      />
-    </label>
+              <div class="grid-2">
+                <mat-form-field appearance="outline">
+                  <mat-label>Numero prenotazioni mensili</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    name="numeroPrenotazioni"
+                    [(ngModel)]="previsione.numeroPrenotazioni"
+                    required
+                    min="0"
+                    step="1"
+                    #numeroPrenotazioni="ngModel"
+                  />
+                  @if ((numeroPrenotazioni.invalid && (numeroPrenotazioni.touched || form.submitted))) {
+                    <mat-error>Campo obbligatorio</mat-error>
+                  }
+                </mat-form-field>
 
-    <label>
-      Prezzo medio per notte (€)
-      <input
-        type="number"
-        name="prezzoMedioPerNotte"
-        [(ngModel)]="previsione.prezzoMedioPerNotte"
-        min="0"
-      />
-    </label>
-  </fieldset>
+                <mat-form-field appearance="outline">
+                  <mat-label>Notti mensili totali</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    name="numeroNottiMensili"
+                    [(ngModel)]="previsione.numeroNottiMensili"
+                    required
+                    min="0"
+                    step="1"
+                    #numeroNottiMensili="ngModel"
+                  />
+                  @if ((numeroNottiMensili.invalid && (numeroNottiMensili.touched || form.submitted))) {
+                    <mat-error>Campo obbligatorio</mat-error>
+                  }
+                </mat-form-field>
 
-  <!-- GESTIONE -->
-  <fieldset>
-    <legend>Gestione</legend>
+                <mat-form-field appearance="outline" class="col-2">
+                  <mat-label>Prezzo medio per notte</mat-label>
+                  <span matTextPrefix>€&nbsp;</span>
+                  <input
+                    matInput
+                    type="number"
+                    name="prezzoMedioPerNotte"
+                    [(ngModel)]="previsione.prezzoMedioPerNotte"
+                    required
+                    min="0"
+                    step="0.01"
+                    #prezzoMedioPerNotte="ngModel"
+                  />
+                  @if ((prezzoMedioPerNotte.invalid && (prezzoMedioPerNotte.touched || form.submitted))) {
+                    <mat-error>Campo obbligatorio</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </mat-card>
 
-    <label>
-      Tipo gestione
-      <select
-        name="tipoGestione"
-        [(ngModel)]="previsione.tipoGestione">
-        <option value="">Seleziona</option>
-        <option value="diretta">Diretta</option>
-        <option value="cohost">Co-host</option>
-        <option value="agenzia">Agenzia</option>
-      </select>
-    </label>
+          </div>
 
-    <label>
-      Appartamento gestito direttamente
-      <input
-        type="checkbox"
-        name="appartamentoDiretto"
-        [(ngModel)]="previsione.appartamentoDiretto"
-      />
-    </label>
+          <!-- COLONNA DESTRA -->
+          <div class="col">
 
-    <label>
-      Commissione Host (€)
-      <input
-        type="number"
-        name="commissioneHost"
-        [(ngModel)]="previsione.commissioneHost"
-        min="0"
-      />
-    </label>
+            <mat-card class="subcard">
+              <mat-card-title class="subcard-title">Costi fissi</mat-card-title>
 
-    <label>
-      Commissione Co-Host (€)
-      <input
-        type="number"
-        name="commissioneCoHost"
-        [(ngModel)]="previsione.commissioneCoHost"
-        min="0"
-      />
-    </label>
+              <div class="grid-2">
+                <mat-form-field appearance="outline" class="col-2">
+                  <mat-label>Mutuo / Affitto mensile</mat-label>
+                  <span matTextPrefix>€&nbsp;</span>
+                  <input
+                    matInput
+                    type="number"
+                    name="mutuoAffitto"
+                    [(ngModel)]="previsione.mutuoAffitto"
+                    min="0"
+                    step="0.01"
+                  />
+                </mat-form-field>
 
-    <label>
-      Commissione totale gestione (€)
-      <input
-        type="number"
-        name="commissioneGestioneTotale"
-        [(ngModel)]="previsione.commissioneGestioneTotale"
-        min="0"
-      />
-    </label>
-  </fieldset>
+                <mat-form-field appearance="outline">
+                  <mat-label>Utenze mensili</mat-label>
+                  <span matTextPrefix>€&nbsp;</span>
+                  <input
+                    matInput
+                    type="number"
+                    name="costoUtenzeMensili"
+                    [(ngModel)]="previsione.costoUtenzeMensili"
+                    min="0"
+                    step="0.01"
+                  />
+                </mat-form-field>
 
-  <!-- TASSE E PIATTAFORMA -->
-  <fieldset>
-    <legend>Tasse e piattaforma</legend>
+                <mat-form-field appearance="outline">
+                  <mat-label>Costo pulizia per soggiorno</mat-label>
+                  <span matTextPrefix>€&nbsp;</span>
+                  <input
+                    matInput
+                    type="number"
+                    name="costoPulizia"
+                    [(ngModel)]="previsione.costoPulizia"
+                    min="0"
+                    step="0.01"
+                  />
+                </mat-form-field>
+              </div>
+            </mat-card>
 
-    <label>
-      Costi tasse (€)
-      <input
-        type="number"
-        name="costoTasse"
-        [(ngModel)]="previsione.costoTasse"
-        min="0"
-      />
-    </label>
+            <mat-card class="subcard">
+              <mat-card-title class="subcard-title">Gestione</mat-card-title>
 
-    <label>
-      Costi piattaforma (€)
-      <input
-        type="number"
-        name="costoPiattaforma"
-        [(ngModel)]="previsione.costoPiattaforma"
-        min="0"
-      />
-    </label>
-  </fieldset>
+              <div class="grid-2">
+                <mat-form-field appearance="outline" class="col-2">
+                  <mat-label>Tipo gestione</mat-label>
+                  <mat-select
+                    name="tipoGestione"
+                    [(ngModel)]="previsione.tipoGestione"
+                    required
+                    (selectionChange)="onTipoGestioneChange()"
+                    #tipoGestione="ngModel"
+                  >
+                    <mat-option value="">Seleziona</mat-option>
+                    <mat-option value="diretta">Diretta</mat-option>
+                    <mat-option value="cohost">Co-host</mat-option>
+                    <mat-option value="agenzia">Agenzia</mat-option>
+                  </mat-select>
 
-  <button type="submit" [disabled]="form.invalid">
-    Calcola previsione
-  </button>
+                  @if ((tipoGestione.invalid && (tipoGestione.touched || form.submitted))) {
+                    <mat-error>Seleziona un tipo gestione</mat-error>
+                  }
+                </mat-form-field>
 
-</form>
+                <div class="checkbox-wrap col-2">
+                  <mat-checkbox
+                    name="appartamentoDiretto"
+                    [(ngModel)]="previsione.appartamentoDiretto"
+                  >
+                    Appartamento gestito direttamente
+                  </mat-checkbox>
+                </div>
 
-<!-- RISULTATI -->
-<section *ngIf="risultato">
-  <h2>Risultati previsione</h2>
+                <!-- Se diretta: SOLO commissione totale -->
+                @if (previsione.tipoGestione === 'diretta') {
+                  <mat-form-field appearance="outline" class="col-2">
+                    <mat-label>Commissione totale gestione</mat-label>
+                    <span matTextSuffix>%</span>
+                    <input
+                      matInput
+                      type="number"
+                      name="commissioneGestioneTotale"
+                      [(ngModel)]="previsione.commissioneGestioneTotale"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                    />
+                  </mat-form-field>
+                } @else {
+                  <!-- Altrimenti: host + cohost, e totale calcolata (readonly) -->
+                  <mat-form-field appearance="outline">
+                    <mat-label>Commissione Host</mat-label>
+                    <span matTextSuffix>%</span>
+                    <input
+                      matInput
+                      type="number"
+                      name="commissioneHost"
+                      [(ngModel)]="previsione.commissioneHost"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      (ngModelChange)="ricalcolaTotaleGestione()"
+                    />
+                  </mat-form-field>
 
-  <p>Lordo pernottamenti: {{ risultato.totaleLordoPernottamenti }} €</p>
-  <p>Costo pulizie: {{ risultato.totaleCostoPulizia}} €</p>
-  <p>Costo tasse: {{ risultato.totaleCostoTassa }} €</p>
-  <p>Costo piattaforma: {{ risultato.totaleCostoPiattaforma }} €</p>
-  <p>Costo Host: {{ risultato.totaleCommissioneHost }} €</p>
-  <p>Costo CoHost: {{ risultato.totaleCommissioneCoHost }} €</p>
-  <p>Costo totale lordo gestione: {{ risultato.totaleCostoPiattaforma }} €</p>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Commissione Co-Host</mat-label>
+                    <span matTextSuffix>%</span>
+                    <input
+                      matInput
+                      type="number"
+                      name="commissioneCoHost"
+                      [(ngModel)]="previsione.commissioneCoHost"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      (ngModelChange)="ricalcolaTotaleGestione()"
+                    />
+                  </mat-form-field>
 
-  <p><strong>Netto proprietaria: {{ risultato.totaleNettoProprietario }} €</strong></p>
-</section>
+                  <mat-form-field appearance="outline" class="col-2">
+                    <mat-label>Commissione totale gestione</mat-label>
+                    <span matTextSuffix>%</span>
+                    <input
+                      matInput
+                      type="number"
+                      name="commissioneGestioneTotale"
+                      [(ngModel)]="previsione.commissioneGestioneTotale"
+                      readonly
+                    />
+                    <mat-hint>Calcolata automaticamente (Host + Co-Host)</mat-hint>
+                  </mat-form-field>
+                }
+              </div>
+            </mat-card>
 
+            <mat-card class="subcard">
+              <mat-card-title class="subcard-title">Tasse e piattaforma</mat-card-title>
+
+              <div class="grid-2">
+                <mat-form-field appearance="outline">
+                  <mat-label>Costi tasse</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    name="costoTasse"
+                    [(ngModel)]="previsione.costoTasse"
+                    required
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    #costoTasse="ngModel"
+                  />
+                  <span matTextSuffix>%</span>
+                  @if ((costoTasse.invalid && (costoTasse.touched || form.submitted))) {
+                    <mat-error>Campo obbligatorio</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Costi piattaforma</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    name="costoPiattaforma"
+                    [(ngModel)]="previsione.costoPiattaforma"
+                    required
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    #costoPiattaforma="ngModel"
+                  />
+                  <span matTextSuffix>%</span>
+                  @if ((costoPiattaforma.invalid && (costoPiattaforma.touched || form.submitted))) {
+                    <mat-error>Campo obbligatorio</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </mat-card>
+
+          </div>
+        </div>
+
+        <!-- AZIONI -->
+        <div class="actions">
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="resetForm(form)"
+            [disabled]="loading"
+          >
+            Reset
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid || loading"
+          >
+            <mat-icon>calculate</mat-icon>
+            Calcola previsione
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+}
+
+<!-- RISULTATI: mostrati solo se ho risultato -->
+@if (risultato) {
+  <mat-card class="results">
+    <mat-card-header>
+      <mat-card-title>Risultati previsione</mat-card-title>
+      <mat-card-subtitle>{{ previsione.nomeAppartamento }} — {{ previsione.indirizzo }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="results-grid">
+        <div class="kpi">
+          <div class="kpi-label">Lordo pernottamenti</div>
+          <div class="kpi-value">€ {{ risultato.totaleLordoPernottamenti }}</div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">Costo pulizie</div>
+          <div class="kpi-value">€ {{ risultato.totaleCostoPulizia }}</div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">Costo tasse</div>
+          <div class="kpi-value">€ {{ risultato.totaleCostoTassa }}</div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">Costo piattaforma</div>
+          <div class="kpi-value">€ {{ risultato.totaleCostoPiattaforma }}</div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">Commissione Host</div>
+          <div class="kpi-value">€ {{ risultato.totaleCommissioneHost }}</div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">Commissione Co-Host</div>
+          <div class="kpi-value">€ {{ risultato.totaleCommissioneCoHost }}</div>
+        </div>
+
+        <div class="kpi highlight">
+          <div class="kpi-label">Netto proprietario</div>
+          <div class="kpi-value">€ {{ risultato.totaleNettoProprietario }}</div>
+        </div>
+      </div>
+
+      <div class="actions results-actions">
+        <button mat-stroked-button type="button" (click)="nuovoCalcolo()">
+          <mat-icon>edit</mat-icon>
+          Nuovo calcolo
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}
