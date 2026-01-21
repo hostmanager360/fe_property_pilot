@@ -162,8 +162,9 @@
             <mat-card class="subcard">
               <mat-card-title class="subcard-title">Costi fissi</mat-card-title>
 
-              <div class="grid-2">
-                <mat-form-field appearance="outline" class="col-2">
+              <!-- MODIFICATO: 3 campi sulla stessa riga -->
+              <div class="grid-3">
+                <mat-form-field appearance="outline">
                   <mat-label>Mutuo / Affitto mensile</mat-label>
                   <span matTextPrefix>€&nbsp;</span>
                   <input
@@ -220,7 +221,7 @@
                     <mat-option value="">Seleziona</mat-option>
                     <mat-option value="diretta">Diretta</mat-option>
                     <mat-option value="cohost">Co-host</mat-option>
-                    <mat-option value="agenzia">Agenzia</mat-option>
+                    <!-- RIMOSSO: Agenzia -->
                   </mat-select>
 
                   @if ((tipoGestione.invalid && (tipoGestione.touched || form.submitted))) {
@@ -228,14 +229,7 @@
                   }
                 </mat-form-field>
 
-                <div class="checkbox-wrap col-2">
-                  <mat-checkbox
-                    name="appartamentoDiretto"
-                    [(ngModel)]="previsione.appartamentoDiretto"
-                  >
-                    Appartamento gestito direttamente
-                  </mat-checkbox>
-                </div>
+                <!-- RIMOSSO: checkbox "Appartamento gestito direttamente" -->
 
                 <!-- Se diretta: SOLO commissione totale -->
                 @if (previsione.tipoGestione === 'diretta') {
@@ -347,7 +341,7 @@
           </div>
         </div>
 
-        <!-- AZIONI -->
+        <!-- AZIONI (centrate via CSS) -->
         <div class="actions">
           <button
             mat-stroked-button

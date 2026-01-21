@@ -1,11 +1,11 @@
 import { HttpClientModule } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 
 import { PrevisioneGuadagnoDto } from '../../model/PrevisioneGuadagnoDto';
 import { PrevisioneGuadagnoService } from '../../services/previsioneService/previsione-guadagno-service';
-import { ResponseHandler } from '../../model/ResponseHandler';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -18,7 +18,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-
 @Component({
   selector: 'app-previsione-guadagno',
   standalone: true,
@@ -26,7 +25,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     CommonModule,
     FormsModule,
     HttpClientModule,
-     // Material
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -47,28 +45,47 @@ export class PrevisioneGuadagno {
   loading = false;
   errorMessage: string | null = null;
 
-  constructor(private service: PrevisioneGuadagnoService) {}
+  constructor(
+    private service: PrevisioneGuadagnoService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   calcola(): void {
     this.loading = true;
     this.errorMessage = null;
     this.risultato = undefined;
 
+    // Forzo un primo refresh: fa sparire/mostrare subito la progress bar
+    this.cdr.detectChanges();
+
     // sicurezza: se non diretta, aggiorno totale gestione prima di inviare
     this.ricalcolaTotaleGestione();
 
-    this.service.calcola(this.previsione).subscribe({
-      next: (data) => {
-        this.risultato = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.loading = false;
-        this.errorMessage =
-          err?.message || 'Si è verificato un errore durante il calcolo.';
-        console.error('Errore chiamata:', err);
-      },
-    });
+    this.service
+      .calcola(this.previsione)
+      .pipe(
+        finalize(() => {
+          // finalize gira sia in success che in error: spegne sempre il loading
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          this.risultato = data;
+
+          // IMPORTANTISSIMO: forza l’aggiornamento immediato della view
+          // (evita il “devo cliccare un input per vedere i risultati”)
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.errorMessage =
+            err?.message || 'Si è verificato un errore durante il calcolo.';
+          console.error('Errore chiamata:', err);
+
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   onTipoGestioneChange(): void {
@@ -76,12 +93,10 @@ export class PrevisioneGuadagno {
     if (this.previsione.tipoGestione === 'diretta') {
       this.previsione.commissioneHost = 0 as any;
       this.previsione.commissioneCoHost = 0 as any;
-      // lascio commissioneGestioneTotale editabile
       return;
     }
 
-    // Se NON diretta: totale diventa somma di host + cohost
-    // Se vuoti, li porto a 0 per evitare NaN
+    // Se NON diretta: totale = host + cohost (evito NaN)
     this.previsione.commissioneHost = (this.previsione.commissioneHost ?? 0) as any;
     this.previsione.commissioneCoHost = (this.previsione.commissioneCoHost ?? 0) as any;
     this.ricalcolaTotaleGestione();
@@ -93,14 +108,13 @@ export class PrevisioneGuadagno {
     const host = Number(this.previsione.commissioneHost ?? 0);
     const cohost = Number(this.previsione.commissioneCoHost ?? 0);
 
-    const totale = host + cohost;
-    this.previsione.commissioneGestioneTotale = totale as any;
+    this.previsione.commissioneGestioneTotale = (host + cohost) as any;
   }
 
   nuovoCalcolo(): void {
-    // Mostra di nuovo il form mantenendo i dati (se preferisci reset totale dimmelo)
     this.risultato = undefined;
     this.errorMessage = null;
+    this.cdr.detectChanges();
   }
 
   resetForm(form: any): void {
@@ -108,5 +122,7 @@ export class PrevisioneGuadagno {
     this.previsione = new PrevisioneGuadagnoDto();
     this.risultato = undefined;
     this.errorMessage = null;
+    this.loading = false;
+    this.cdr.detectChanges();
   }
 }
