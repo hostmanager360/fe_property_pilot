@@ -91,7 +91,7 @@ export class PrevisioneGuadagno {
   onTipoGestioneChange(): void {
     // Se diretta: azzero host/cohost (non servono)
     if (this.previsione.tipoGestione === 'diretta') {
-      this.previsione.commissioneHost = 0 as any;
+      this.previsione.commissioneHost = this.previsione.commissioneGestioneTotale;
       this.previsione.commissioneCoHost = 0 as any;
       return;
     }
@@ -103,7 +103,10 @@ export class PrevisioneGuadagno {
   }
 
   ricalcolaTotaleGestione(): void {
-    if (this.previsione.tipoGestione === 'diretta') return;
+    if (this.previsione.tipoGestione === 'diretta') {
+      this.previsione.commissioneHost = this.previsione.commissioneGestioneTotale;
+      this.previsione.appartamentoDiretto == true;
+    }
 
     const host = Number(this.previsione.commissioneHost ?? 0);
     const cohost = Number(this.previsione.commissioneCoHost ?? 0);
@@ -114,6 +117,8 @@ export class PrevisioneGuadagno {
   nuovoCalcolo(): void {
     this.risultato = undefined;
     this.errorMessage = null;
+    this.previsione = new PrevisioneGuadagnoDto();
+    this.loading = false;
     this.cdr.detectChanges();
   }
 
