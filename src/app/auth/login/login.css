@@ -1,0 +1,143 @@
+/* Background pagina */
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+
+  background: radial-gradient(1200px 800px at 20% 20%, rgba(255, 255, 255, 0.12), transparent 60%),
+              radial-gradient(900px 600px at 80% 30%, rgba(255, 255, 255, 0.10), transparent 55%),
+              linear-gradient(135deg, #0b1220 0%, #121a2d 35%, #0b1220 100%);
+}
+
+.auth-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(700px 500px at 60% 70%, rgba(94, 234, 212, 0.18), transparent 60%),
+    radial-gradient(650px 450px at 30% 40%, rgba(59, 130, 246, 0.18), transparent 60%);
+  pointer-events: none;
+}
+
+/* Card Material */
+.auth-card {
+  width: min(440px, 92vw);
+  z-index: 1;
+  border-radius: 18px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+}
+
+/* Header */
+.auth-header {
+  padding-bottom: 6px;
+}
+
+:host ::ng-deep .auth-header .mat-mdc-card-title {
+  color: rgba(255, 255, 255, 0.96);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+:host ::ng-deep .auth-header .mat-mdc-card-subtitle {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Form */
+.auth-form {
+  display: grid;
+  gap: 14px;
+  padding-top: 6px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Material form field */
+:host ::ng-deep .mat-mdc-form-field .mdc-text-field--outlined {
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+:host ::ng-deep .mat-mdc-form-field .mdc-text-field__input {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+:host ::ng-deep .mat-mdc-form-field .mdc-floating-label {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* Focus outline */
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: rgba(94, 234, 212, 0.55) !important;
+}
+
+/* Link registrazione */
+.register-link {
+  cursor: pointer;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.register-cta {
+  color: rgba(94, 234, 212, 0.95);
+  font-weight: 800;
+}
+
+/* Toggle "Mostra password" */
+.toggle-btn {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 8px;
+  height: 30px;
+  line-height: 30px;
+}
+
+/* Pulsante principale */
+.primary-btn {
+  height: 46px;
+  border-radius: 14px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.with-spinner {
+  opacity: 0.95;
+}
+
+/* Errore server */
+.server-error {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: rgba(255, 160, 160, 0.95);
+}
+
+/* Mobile */
+@media (max-width: 420px) {
+  :host ::ng-deep .mat-mdc-card-content {
+    padding: 16px;
+  }
+}
