@@ -144,7 +144,7 @@
                     [(ngModel)]="previsione.prezzoMedioPerNotte"
                     required
                     min="0"
-                    step="0.01"
+                    step="1"
                     #prezzoMedioPerNotte="ngModel"
                   />
                   @if ((prezzoMedioPerNotte.invalid && (prezzoMedioPerNotte.touched || form.submitted))) {
@@ -166,19 +166,19 @@
                 <mat-form-field appearance="outline">
                   <mat-label>Mutuo / Affitto mensile</mat-label>
                   <span matTextPrefix>€&nbsp;</span>
-                  <input matInput type="number" name="mutuoAffitto" [(ngModel)]="previsione.mutuoAffitto" min="0" step="0.01" />
+                  <input matInput type="number" name="mutuoAffitto" [(ngModel)]="previsione.mutuoAffitto" min="0" step="1" />
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                   <mat-label>Utenze mensili</mat-label>
                   <span matTextPrefix>€&nbsp;</span>
-                  <input matInput type="number" name="costoUtenzeMensili" [(ngModel)]="previsione.costoUtenzeMensili" min="0" step="0.01" />
+                  <input matInput type="number" name="costoUtenzeMensili" [(ngModel)]="previsione.costoUtenzeMensili" min="0" step="1" />
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                   <mat-label>Costo pulizia per soggiorno</mat-label>
                   <span matTextPrefix>€&nbsp;</span>
-                  <input matInput type="number" name="costoPulizia" [(ngModel)]="previsione.costoPulizia" min="0" step="0.01" />
+                  <input matInput type="number" name="costoPulizia" [(ngModel)]="previsione.costoPulizia" min="0" step="1" />
                 </mat-form-field>
               </div>
             </mat-card>
@@ -221,7 +221,7 @@
                       [(ngModel)]="previsione.commissioneHost"
                       min="0"
                       max="100"
-                      step="0.01"
+                      step="1"
                       (ngModelChange)="ricalcolaTotaleGestione()"
                     />
                   </mat-form-field>
@@ -236,7 +236,7 @@
                       [(ngModel)]="previsione.commissioneCoHost"
                       min="0"
                       max="100"
-                      step="0.01"
+                      step="1"
                       (ngModelChange)="ricalcolaTotaleGestione()"
                     />
                   </mat-form-field>
@@ -256,7 +256,7 @@
                       [(ngModel)]="previsione.commissioneGestioneTotale"
                       min="0"
                       max="100"
-                      step="0.01"
+                      step="1"
                     />
                   </mat-form-field>
                 }
@@ -277,7 +277,7 @@
                     required
                     min="0"
                     max="100"
-                    step="0.01"
+                    step="1"
                     #costoTasse="ngModel"
                   />
                   <span matTextSuffix>%</span>
@@ -296,7 +296,7 @@
                     required
                     min="0"
                     max="100"
-                    step="0.01"
+                    step="1"
                     #costoPiattaforma="ngModel"
                   />
                   <span matTextSuffix>%</span>
