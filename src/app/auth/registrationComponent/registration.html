@@ -1,14 +1,22 @@
 <div class="auth-page">
   <div class="auth-overlay"></div>
 
+  <!-- Brand sopra la card -->
+  <div class="brand">
+    <img class="brand-logo" src="assets/propertypilot-logo.png" alt="PropertyPilot logo" />
+    <div class="brand-title">PropertyPilot</div>
+    <div class="brand-subtitle">Create • Manage • Scale</div>
+  </div>
+
   <mat-card class="auth-card" appearance="outlined">
-    <mat-card-header class="auth-header">
+    <mat-card-header class="auth-header auth-header-center">
       <mat-card-title>Registrazione</mat-card-title>
       <mat-card-subtitle>Crea il tuo account</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
       <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input
@@ -18,26 +26,18 @@
             autocomplete="email"
             placeholder="nome@dominio.com"
           />
-          <mat-error *ngIf="email?.touched && email?.hasError('required')">
-            Email obbligatoria
-          </mat-error>
-          <mat-error *ngIf="email?.touched && email?.hasError('email')">
-            Inserisci un’email valida
-          </mat-error>
+          <mat-error *ngIf="email?.touched && email?.hasError('required')">Email obbligatoria</mat-error>
+          <mat-error *ngIf="email?.touched && email?.hasError('email')">Inserisci un’email valida</mat-error>
         </mat-form-field>
 
-<!--       <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>Ruolo</mat-label>
           <mat-select formControlName="role">
-            <mat-option *ngFor="let r of roles" [value]="r.value">
-              {{ r.label }}
-            </mat-option>
+            <mat-option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</mat-option>
           </mat-select>
-          <mat-error *ngIf="role?.touched && role?.hasError('required')">
-            Seleziona un ruolo
-          </mat-error>
+          <mat-error *ngIf="role?.touched && role?.hasError('required')">Seleziona un ruolo</mat-error>
         </mat-form-field>
---> 
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Password</mat-label>
           <input
@@ -47,22 +47,11 @@
             autocomplete="new-password"
             placeholder="Minimo 6 caratteri"
           />
-          <button
-            mat-button
-            type="button"
-            class="toggle-btn"
-            matSuffix
-            (click)="showPassword = !showPassword"
-          >
+          <button mat-button type="button" class="toggle-btn" matSuffix (click)="showPassword = !showPassword">
             {{ showPassword ? 'Nascondi' : 'Mostra password' }}
           </button>
-
-          <mat-error *ngIf="password?.touched && password?.hasError('required')">
-            Password obbligatoria
-          </mat-error>
-          <mat-error *ngIf="password?.touched && password?.hasError('minlength')">
-            Minimo 6 caratteri
-          </mat-error>
+          <mat-error *ngIf="password?.touched && password?.hasError('required')">Password obbligatoria</mat-error>
+          <mat-error *ngIf="password?.touched && password?.hasError('minlength')">Minimo 6 caratteri</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
@@ -74,37 +63,15 @@
             autocomplete="new-password"
             placeholder="Ripeti la password"
           />
-          <button
-            mat-button
-            type="button"
-            class="toggle-btn"
-            matSuffix
-            (click)="showConfirmPassword = !showConfirmPassword"
-          >
+          <button mat-button type="button" class="toggle-btn" matSuffix (click)="showConfirmPassword = !showConfirmPassword">
             {{ showConfirmPassword ? 'Nascondi' : 'Mostra password' }}
           </button>
-
-          <mat-error *ngIf="confirmPassword?.touched && confirmPassword?.hasError('required')">
-            Conferma password obbligatoria
-          </mat-error>
-          <mat-error *ngIf="passwordsMismatch">
-            Le password non coincidono
-          </mat-error>
+          <mat-error *ngIf="confirmPassword?.touched && confirmPassword?.hasError('required')">Conferma password obbligatoria</mat-error>
+          <mat-error *ngIf="passwordsMismatch">Le password non coincidono</mat-error>
         </mat-form-field>
 
-        <button
-          mat-flat-button
-          color="primary"
-          class="primary-btn"
-          type="submit"
-          [disabled]="isSubmitting"
-        >
-          <mat-progress-spinner
-            *ngIf="isSubmitting"
-            diameter="18"
-            mode="indeterminate"
-          ></mat-progress-spinner>
-
+        <button mat-flat-button class="primary-btn" type="submit" [disabled]="isSubmitting || form.invalid">
+          <mat-progress-spinner *ngIf="isSubmitting" diameter="18" mode="indeterminate"></mat-progress-spinner>
           <span [class.with-spinner]="isSubmitting">Registrati</span>
         </button>
 
@@ -113,9 +80,7 @@
           <a class="login-link" routerLink="/">Vai al login</a>
         </div>
 
-        <mat-error *ngIf="errorMessage" class="server-error">
-          {{ errorMessage }}
-        </mat-error>
+        <mat-error *ngIf="errorMessage" class="server-error">{{ errorMessage }}</mat-error>
       </form>
     </mat-card-content>
   </mat-card>
