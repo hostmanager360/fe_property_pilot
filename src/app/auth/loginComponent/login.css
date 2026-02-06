@@ -10,7 +10,33 @@
               radial-gradient(900px 600px at 80% 30%, rgba(255, 255, 255, 0.10), transparent 55%),
               linear-gradient(135deg, #0b1220 0%, #121a2d 35%, #0b1220 100%);
 }
+.brand {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.brand-logo {
+  width: 30%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 25px rgba(243, 240, 240, 0.6));
+}
 
+.brand-title {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.7px;
+  color:  rgba(255, 255, 255, 0.92);
+}
+
+.brand-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  color:  rgba(255, 255, 255, 0.92);;
+}
 .auth-overlay {
   position: absolute;
   inset: 0;

@@ -1,0 +1,211 @@
+<mat-card class="card">
+  <h2 class="title">Completa i dati del Tenant</h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <!-- Selezione tipo soggetto -->
+    <div class="row center">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Tipo soggetto</mat-label>
+        <mat-select formControlName="tipoSoggetto">
+          <mat-option [value]="'PERSONA_FISICA'">Persona fisica</mat-option>
+          <mat-option [value]="'AZIENDA'">Azienda</mat-option>
+        </mat-select>
+        <mat-error *ngIf="hasError('tipoSoggetto', 'required')">
+          Seleziona il tipo di soggetto
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Mostra il resto solo se tipoSoggetto valorizzato -->
+    <div *ngIf="form.get('tipoSoggetto')?.value as tipo">
+
+      <!-- Persona fisica: nome, cognome, CF -->
+      <div class="row" *ngIf="tipo === 'PERSONA_FISICA'">
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Nome</mat-label>
+          <input matInput formControlName="nome" />
+          <mat-error *ngIf="hasError('nome', 'required')">
+            Il nome è obbligatorio
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Cognome</mat-label>
+          <input matInput formControlName="cognome" />
+          <mat-error *ngIf="hasError('cognome', 'required')">
+            Il cognome è obbligatorio
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row" *ngIf="tipo === 'PERSONA_FISICA'">
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Codice Fiscale</mat-label>
+          <input matInput formControlName="codiceFiscale" />
+          <mat-error *ngIf="hasError('codiceFiscale', 'required')">
+            Il codice fiscale è obbligatorio
+          </mat-error>
+          <mat-error *ngIf="hasError('codiceFiscale', 'codiceFiscaleInvalid')">
+            Codice fiscale non valido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Dati aziendali comuni (PF + Azienda) -->
+      <div class="row">
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Nome società</mat-label>
+          <input matInput formControlName="ragioneSociale" />
+          <mat-error *ngIf="hasError('ragioneSociale', 'required')">
+            Il nome della società è obbligatorio
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Partita IVA</mat-label>
+          <input matInput formControlName="partitaIva" />
+          <mat-error *ngIf="hasError('partitaIva', 'required')">
+            La partita IVA è obbligatoria
+          </mat-error>
+          <mat-error *ngIf="hasError('partitaIva', 'partitaIvaInvalid')">
+            Partita IVA non valida
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Residenza (solo persona fisica) -->
+      <div class="row" *ngIf="tipo === 'PERSONA_FISICA'">
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Via di residenza</mat-label>
+          <input matInput formControlName="viaResidenza" />
+          <mat-error *ngIf="hasError('viaResidenza', 'required')">
+            La via è obbligatoria
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row" *ngIf="tipo === 'PERSONA_FISICA'">
+        <mat-form-field appearance="outline" class="third">
+          <mat-label>Civico</mat-label>
+          <input matInput formControlName="civicoResidenza" />
+          <mat-error *ngIf="hasError('civicoResidenza', 'required')">
+            Il civico è obbligatorio
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="third">
+          <mat-label>Città</mat-label>
+          <input matInput formControlName="cittaResidenza" />
+          <mat-error *ngIf="hasError('cittaResidenza', 'required')">
+            La città è obbligatoria
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="third">
+          <mat-label>CAP</mat-label>
+          <input matInput formControlName="capResidenza" />
+          <mat-error *ngIf="hasError('capResidenza', 'required')">
+            Il CAP è obbligatorio
+          </mat-error>
+          <mat-error *ngIf="hasError('capResidenza', 'pattern')">
+            CAP non valido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Sede fisica (entrambi) -->
+      <div class="row">
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Via sede fisica</mat-label>
+          <input matInput formControlName="viaSedeFisica" />
+          <mat-error *ngIf="hasError('viaSedeFisica', 'required')">
+            La via della sede è obbligatoria
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field appearance="outline" class="third">
+          <mat-label>Città sede fisica</mat-label>
+          <input matInput formControlName="cittaSedeFisica" />
+          <mat-error *ngIf="hasError('cittaSedeFisica', 'required')">
+            La città della sede è obbligatoria
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="third">
+          <mat-label>CAP sede fisica</mat-label>
+          <input matInput formControlName="capSedeFisica" />
+          <mat-error *ngIf="hasError('capSedeFisica', 'required')">
+            Il CAP della sede è obbligatorio
+          </mat-error>
+          <mat-error *ngIf="hasError('capSedeFisica', 'pattern')">
+            CAP non valido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Date + licenza + status -->
+      <div class="row">
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Data iscrizione</mat-label>
+          <input
+            matInput
+            [matDatepicker]="pickerIscrizione"
+            formControlName="dataIscrizione"
+          />
+          <mat-datepicker-toggle matSuffix [for]="pickerIscrizione"></mat-datepicker-toggle>
+          <mat-datepicker #pickerIscrizione></mat-datepicker>
+          <mat-error *ngIf="hasError('dataIscrizione', 'required')">
+            La data di iscrizione è obbligatoria
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Data scadenza</mat-label>
+          <input
+            matInput
+            [matDatepicker]="pickerScadenza"
+            formControlName="dataScadenza"
+          />
+          <mat-datepicker-toggle matSuffix [for]="pickerScadenza"></mat-datepicker-toggle>
+          <mat-datepicker #pickerScadenza></mat-datepicker>
+          <mat-error *ngIf="form.hasError('invalidDateRange')">
+            La data di scadenza deve essere successiva alla data di iscrizione
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Tipo licenza</mat-label>
+          <mat-select formControlName="tipoLicenzaId">
+            <mat-option [value]="1">Standard</mat-option>
+            <mat-option [value]="2">Premium</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="statusId">
+            <mat-option [value]="1">Attivo</mat-option>
+            <mat-option [value]="2">Sospeso</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <button
+        mat-flat-button
+        color="primary"
+        class="full submit-btn"
+        type="submit"
+        [disabled]="loading"
+      >
+        <span *ngIf="!loading">Salva e continua</span>
+        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+      </button>
+    </div>
+  </form>
+</mat-card>

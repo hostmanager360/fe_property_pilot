@@ -22,7 +22,7 @@
   padding-top: 40px;
   position: relative;
   overflow: hidden;
-  gap: 50px;   /* ✅ QUESTA è la distanza tra brand e card */
+  gap: 5px;   /* ✅ QUESTA è la distanza tra brand e card */
 
   background:
      radial-gradient(600px 400px at 50% 45%, rgba(255,255,255,0.06), transparent 65%),
@@ -45,12 +45,17 @@
   gap: 6px;
   text-align: center;
 }
+.auth-scale {
+  transform-origin: top center;
+  transition: transform 0.25s ease;
+}
+
 
 .brand-logo {
-  width: 40%;
-  height: 80%;
+  width: 30%;
+  height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 10px 25px rgba(243, 240, 240, 0.6));
+  filter: drop-shadow(0 5px 25px rgba(243, 240, 240, 0.6));
 }
 
 .brand-title {
@@ -68,10 +73,14 @@
 
 /* ===== Card ===== */
 .auth-card {
-  width: min(520px, 92vw);
+  transform: scale(0.90);
+  width: min(420px, 92vw);
   position: relative;
   z-index: 1;
   border-radius: 30px;
+
+transform-origin:  center;
+
 
   background: #fbfbfc;          /* opaca */
   overflow: hidden;
@@ -109,7 +118,6 @@
 /* ===== Form ===== */
 .auth-form {
   display: grid;
-  gap: 12px;
   padding-top: 4px;
 }
 

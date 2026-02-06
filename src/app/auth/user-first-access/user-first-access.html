@@ -1,0 +1,65 @@
+<mat-card class="card">
+  <h2>Completa i tuoi dati</h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <div class="row">
+      <mat-form-field appearance="outline" class="half">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" />
+        <mat-error *ngIf="form.get('nome')?.hasError('required')">
+          Il nome è obbligatorio
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half">
+        <mat-label>Cognome</mat-label>
+        <input matInput formControlName="cognome" />
+        <mat-error *ngIf="form.get('cognome')?.hasError('required')">
+          Il cognome è obbligatorio
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="outline" class="half">
+        <mat-label>Telefono</mat-label>
+        <input matInput formControlName="telefono" />
+        <mat-error *ngIf="form.get('telefono')?.hasError('required')">
+          Il telefono è obbligatorio
+        </mat-error>
+        <mat-error *ngIf="form.get('telefono')?.hasError('minlength')">
+          Minimo 8 caratteri
+        </mat-error>
+        <mat-error *ngIf="form.get('telefono')?.hasError('maxlength')">
+          Massimo 15 caratteri
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half">
+        <mat-label>Data di nascita</mat-label>
+        <input
+          matInput
+          [matDatepicker]="pickerNascita"
+          formControlName="dataNascita"
+        />
+        <mat-datepicker-toggle matSuffix [for]="pickerNascita"></mat-datepicker-toggle>
+        <mat-datepicker #pickerNascita></mat-datepicker>
+        <mat-error *ngIf="form.get('dataNascita')?.hasError('required')">
+          La data di nascita è obbligatoria
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <button
+      mat-flat-button
+      color="primary"
+      class="full"
+      type="submit"
+      [disabled]="loading"
+    >
+      <ng-container *ngIf="!loading">Completa</ng-container>
+      <mat-spinner *ngIf="loading" diameter="24"></mat-spinner>
+    </button>
+  </form>
+</mat-card>

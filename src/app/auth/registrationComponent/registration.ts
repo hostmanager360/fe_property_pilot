@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
   AbstractControl,
@@ -22,6 +22,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AuthService } from '../../services/auth/auth-service';
 import { UserDto } from '../../model/auth/RegistrationDto';
+import { TokenStorageService } from '../../services/token-storage';
 
 @Component({
   selector: 'app-registration',
@@ -50,11 +51,12 @@ export class RegistrationComponent {
 
   showPassword = false;
   showConfirmPassword = false;
-
+private tokenStorage = inject(TokenStorageService);
   roles = [
     { value: 'ADMIN', label: 'Admin' },
     { value: 'HOST', label: 'Host' },
     { value: 'CO_HOST', label: 'Co-Host' },
+    { value: 'OWNER', label: 'Owner' },
   ];
 
   constructor(
@@ -104,9 +106,32 @@ export class RegistrationComponent {
       role: this.role?.value,
       password: this.password?.value,
       confermaPassword: this.confirmPassword?.value,
+      tenantKey: this.tokenStorage.getTenantKey() ?? undefined
     };
+    let request$;
 
-    this.auth.register(payload)
+    switch (payload.role) {
+    case 'ADMIN':
+      request$ = this.auth.createAdmin(payload);
+      break;
+
+    case 'HOST':
+      request$ = this.auth.createHost(payload);
+      break;
+
+    case 'CO_HOST':
+      request$ = this.auth.createCohost(payload);
+      break;
+    case 'OWNER':
+      request$ = this.auth.createOwner(payload);
+      break;
+    default:
+      this.errorMessage = 'Ruolo non valido.';
+      this.isSubmitting = false;
+      return;
+  }
+  
+    request$
       .pipe(
         finalize(() => {
           // ✅ garantito: torna sempre false a fine chiamata (ok o errore)
@@ -115,7 +140,7 @@ export class RegistrationComponent {
       )
       .subscribe({
         next: () => {
-          this.router.navigateByUrl('/previsione');
+          this.router.navigateByUrl('/login');
         },
         error: (err) => {
           // ✅ messaggio più utile se il BE lo manda
