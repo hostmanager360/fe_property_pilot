@@ -14,14 +14,14 @@ export class TokenStorageService {
   private FIRST_ACCESS_STEP = 'pp_first_access_step';
 
   saveLoginData(response: any): void {
-    localStorage.setItem(this.TOKEN_KEY, response.accessToken);
-    localStorage.setItem(this.TENANT_KEY, response.tenantKey);
-    localStorage.setItem(this.ROLE_KEY, response.role);
-    localStorage.setItem(this.FIRST_ACCESS_KEY, String(response.firstAccessRequired));
-    localStorage.setItem(this.RESET_REQUIRED_KEY, String(response.passwordResetRequired));
-    localStorage.setItem(this.EMAIL, String(response.email));
-    localStorage.setItem(this.RESET_PASSWORD_TOKEN, String(response.resetPasswordToken));
-    localStorage.setItem(this.FIRST_ACCESS_STEP, response.firstAccessStep);
+    localStorage.setItem(this.TOKEN_KEY, response.data.accessToken);
+    localStorage.setItem(this.TENANT_KEY, response.data.tenantKey);
+    localStorage.setItem(this.ROLE_KEY, response.data.role);
+    localStorage.setItem(this.FIRST_ACCESS_KEY, String(response.data.firstAccessRequired));
+    localStorage.setItem(this.RESET_REQUIRED_KEY, String(response.data.passwordResetRequired));
+    localStorage.setItem(this.EMAIL, String(response.data.email));
+    localStorage.setItem(this.RESET_PASSWORD_TOKEN, String(response.data.resetPasswordToken));
+    localStorage.setItem(this.FIRST_ACCESS_STEP, response.data.firstAccessStep);
   }
 
   getToken(): string | null {
@@ -66,5 +66,13 @@ getPasswordResetRequired(): boolean {
   }
    setnboardingStep(firstaccessStep: any): void{
         localStorage.setItem(this.FIRST_ACCESS_STEP, firstaccessStep);
+  }
+
+  isLogged(): boolean{
+       if(localStorage.getItem(this.FIRST_ACCESS_STEP) != null ) {
+        return true;
+       } else {
+        return false;
+       }
   }
 }

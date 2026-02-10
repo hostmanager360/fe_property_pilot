@@ -1,15 +1,42 @@
-/* Background pagina */
+:root {
+  --gold: #d4af37;
+  --gold-soft: rgba(212, 175, 55, 0.65);
+  --gold-faint: rgba(212, 175, 55, 0.35);
+
+  --bg0: #0b0b0d;
+  --bg1: #121216;
+  --card: rgba(20, 20, 24, 0.96);
+  --field: rgba(10, 10, 12, 0.85);
+
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.62);
+}
+
+/* ===== Page ===== */
 .auth-page {
+  margin-top: 0;
   min-height: 100vh;
   display: grid;
-  place-items: center;
+  justify-items: center;
+  align-content: start;
+  padding-top: 40px;
   position: relative;
   overflow: hidden;
+  gap: 5px;   /* ✅ QUESTA è la distanza tra brand e card */
 
-  background: radial-gradient(1200px 800px at 20% 20%, rgba(255, 255, 255, 0.12), transparent 60%),
-              radial-gradient(900px 600px at 80% 30%, rgba(255, 255, 255, 0.10), transparent 55%),
-              linear-gradient(135deg, #0b1220 0%, #121a2d 35%, #0b1220 100%);
+  background:
+     radial-gradient(600px 400px at 50% 45%, rgba(255,255,255,0.06), transparent 65%),
+    radial-gradient(900px 700px at 50% 80%, rgba(0,0,0,0.85), rgba(0,0,0,0.95) 60%),
+    linear-gradient(135deg, #0b0c0f 0%, #14161b 45%, #0b0c0f 100%);
 }
+
+.auth-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ===== Brand above card ===== */
 .brand {
   position: relative;
   z-index: 3;
@@ -18,6 +45,12 @@
   gap: 6px;
   text-align: center;
 }
+.auth-scale {
+  transform-origin: top center;
+  transition: transform 0.25s ease;
+}
+
+
 .brand-logo {
   width: 30%;
   height: 100%;
@@ -37,133 +70,209 @@
   font-weight: 600;
   color:  rgba(255, 255, 255, 0.92);;
 }
-.auth-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(700px 500px at 60% 70%, rgba(94, 234, 212, 0.18), transparent 60%),
-    radial-gradient(650px 450px at 30% 40%, rgba(59, 130, 246, 0.18), transparent 60%);
-  pointer-events: none;
-}
 
-/* Card Material */
+/* ===== Card ===== */
 .auth-card {
-  width: min(440px, 92vw);
+  transform: scale(0.90);
+  width: min(420px, 92vw);
+  position: relative;
   z-index: 1;
-  border-radius: 18px;
+  border-radius: 30px;
+
+transform-origin:  center;
+
+
+  background: #fbfbfc;          /* opaca */
   overflow: hidden;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  border: 3px solid var(--gold-soft);
+  box-shadow:
+    0 18px 70px rgba(41, 40, 40, 0.65),
+    0 0 0 1px #d4af37,
+    0 0 30px #d4af37;
 }
 
-/* Header */
-.auth-header {
-  padding-bottom: 6px;
+/* ===== Header (centrato) ===== */
+.auth-header-center {
+  justify-content: center;
+  text-align: center;
 }
 
-:host ::ng-deep .auth-header .mat-mdc-card-title {
-  color: rgba(255, 255, 255, 0.96);
-  font-weight: 800;
-  letter-spacing: 0.2px;
+:host ::ng-deep .auth-header-center .mat-mdc-card-header-text {
+  width: 100%;
+  text-align: center;
+  margin: 0;
 }
 
-:host ::ng-deep .auth-header .mat-mdc-card-subtitle {
-  color: rgba(255, 255, 255, 0.72);
+:host ::ng-deep .auth-header-center .mat-mdc-card-title {
+  color: var(--gold);
+  font-weight: 900;
 }
 
-/* Form */
+:host ::ng-deep .auth-header-center .mat-mdc-card-subtitle {
+  color: var(--muted);
+}
+
+/* ===== Form ===== */
 .auth-form {
   display: grid;
-  gap: 14px;
-  padding-top: 6px;
+  padding-top: 4px;
 }
 
-.full-width {
-  width: 100%;
-}
+.full-width { width: 100%; }
 
-/* Material form field */
+/* ===== Material fields ===== */
 :host ::ng-deep .mat-mdc-form-field .mdc-text-field--outlined {
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.55);
+  border-radius: 1px;
+  background: var(--field);
 }
 
-:host ::ng-deep .mat-mdc-form-field .mdc-text-field__input {
-  color: rgba(255, 255, 255, 0.92);
+/* outline base (oro tenue) */
+:host ::ng-deep .mdc-notched-outline__leading,
+:host ::ng-deep .mdc-notched-outline__notch,
+:host ::ng-deep .mdc-notched-outline__trailing {
+  border-color: #d4af37 !important;
 }
 
-:host ::ng-deep .mat-mdc-form-field .mdc-floating-label {
-  color: rgba(255, 255, 255, 0.78);
-}
-
-/* Focus outline */
+/* focus outline (oro pieno) */
 :host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
 :host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
 :host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
-  border-color: rgba(94, 234, 212, 0.55) !important;
+  border-color: var(--gold) !important;
 }
 
-/* Link registrazione */
-.register-link {
-  cursor: pointer;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.78);
-  text-decoration: none;
-  width: fit-content;
+/* label: sempre oro (no blu) */
+:host ::ng-deep .mat-mdc-form-field .mdc-floating-label {
+  color: var(--gold) !important;
+}
+:host ::ng-deep .mat-mdc-form-field.mat-focused .mdc-floating-label {
+  color: var(--gold) !important;
 }
 
-.register-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+/* input text */
+:host ::ng-deep .mat-mdc-form-field .mdc-text-field__input {
+  color: var(--text) !important;
 }
 
-.register-cta {
-  color: rgba(94, 234, 212, 0.95);
-  font-weight: 800;
+/* placeholder */
+:host ::ng-deep .mat-mdc-form-field .mdc-text-field__input::placeholder {
+  color: rgba(255,255,255,0.45) !important;
 }
 
-/* Toggle "Mostra password" */
+/* select arrow oro */
+:host ::ng-deep .mat-mdc-select-arrow {
+  color: var(--gold) !important;
+}
+
+/* toggle button (mostra password) */
 .toggle-btn {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   padding: 0 8px;
   height: 30px;
   line-height: 30px;
+  color: #121216 !important; /* niente blu */
 }
 
-/* Pulsante principale */
+/* ===== Select panel ===== */
+:host ::ng-deep .mat-mdc-select-panel {
+  background: rgba(245, 211, 98, 0.98) !important;
+  border: 1px solid rgba(212,175,55,0.35);
+}
+
+:host ::ng-deep .mat-mdc-option .mdc-list-item__primary-text {
+  color: var(--text) !important;
+}
+
+:host ::ng-deep .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+  color: var(--gold) !important;
+}
+
+/* ===== Primary button ===== */
 .primary-btn {
   height: 46px;
   border-radius: 14px;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.2px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
+
+  background: linear-gradient(150deg, rgba(245, 211, 98, 0.98), rgba(245, 211, 98, 0.98)) !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(212,175,55,0.45) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.55);
 }
 
-.with-spinner {
-  opacity: 0.95;
+.primary-btn:hover {
+  box-shadow: 0 18px 55px rgba(0,0,0,0.65), 0 0 22px rgba(212,175,55,0.18);
 }
 
-/* Errore server */
+.primary-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ===== Secondary row ===== */
+.secondary-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  color: rgba(255,255,255,0.70);
+  font-size: 13px;
+}
+
+.login-link {
+  cursor: pointer;
+  font-weight: 900;
+  color: var(--gold) !important;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(212,175,55,0.35);
+}
+
+.login-link:hover {
+  border-bottom-color: rgba(212,175,55,0.7);
+}
+
+/* Error */
 .server-error {
   display: block;
   margin-top: 2px;
   font-size: 13px;
-  color: rgba(255, 160, 160, 0.95);
+  color: #ff6b6b;
 }
 
 /* Mobile */
 @media (max-width: 420px) {
-  :host ::ng-deep .mat-mdc-card-content {
-    padding: 16px;
-  }
+  :host ::ng-deep .mat-mdc-card-content { padding: 16px; }
+  .brand-title { font-size: 24px; }
+  .brand-logo { width: 56px; height: 56px; }
+}
+.register-link {
+  margin-top: 6px;
+  display: inline-block;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.register-cta {
+  font-weight: 900;
+  color: var(--gold);
+  border-bottom: 1px solid rgba(212,175,55,0.35);
+  transition: all 0.25s ease;
+}
+
+.register-link:hover .register-cta {
+  color: var(--gold);
+  border-bottom-color: rgba(212,175,55,0.75);
+  text-shadow: 0 0 6px rgba(212,175,55,0.45);
 }

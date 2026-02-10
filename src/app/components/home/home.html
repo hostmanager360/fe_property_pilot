@@ -1,0 +1,38 @@
+<div class="home-container">
+
+  <div class="home-header">
+    <h1>Benvenuto in PropertyPilot</h1>
+    <p class="subtitle">Dashboard principale</p>
+  </div>
+
+  <div class="cards">
+    <!-- CARD: Previsione Guadagni -->
+    <div class="card" (click)="goTo('previsione')">
+      <div class="card-icon">
+        <mat-icon>trending_up</mat-icon>
+      </div>
+
+      <h3>Previsione Guadagni</h3>
+      <p>Analizza le tue proprietà e stima i ricavi futuri.</p>
+
+      <span class="card-link">Vai a Previsione →</span>
+    </div>
+
+    <!-- CARD: Gestione Utenti -->
+    <div class="card" (click)="goTo('utenti')">
+      <div class="card-icon">
+        <mat-icon>group</mat-icon>
+      </div>
+
+      <h3>Gestione Utenti</h3>
+      <p>Gestisci utenti e permessi della piattaforma.</p>
+
+      <span class="card-link">Crea Utenza →</span>
+    </div>
+  </div>
+
+  <footer>
+    Oggi: {{ today | date:'fullDate' }}
+  </footer>
+
+</div>

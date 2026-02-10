@@ -1,61 +1,95 @@
 import { Routes } from '@angular/router';
-import { PrevisioneGuadagno } from './components/previsione-guadagno/previsione-guadagno';
 import { AuthGuard } from './auth/auth.guard';
 import { RoleGuard } from './auth/role.guard';
 import { OnboardingGuard } from './auth/OnboardingGuard';
 
-export const routes: Routes = [
- {
-    path: '',
-    loadComponent: () => import('./auth/loginComponent/login').then(m => m.LoginComponent),
-    pathMatch: 'full',
-  },
+// Rotte pubbliche (senza layout principale)
+const publicRoutes: Routes = [
   {
-    path: 'registration',
-    loadComponent: () => import('./auth/registrationComponent/registration').then(m => m.RegistrationComponent),
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./auth/loginComponent/login').then(m => m.LoginComponent),
   },
-
-  // RESET PASSWORD
   {
     path: 'reset-password',
-    loadComponent: () => import('./auth/reset-password/reset-password').then(m => m.ResetPassword),
+    loadComponent: () =>
+      import('./auth/reset-password/reset-password').then(m => m.ResetPassword),
   },
+  {
+    path: 'reset-password-final',
+    loadComponent: () =>
+      import('./auth/reset-password-final/reset-password-final')
+        .then(m => m.ResetPasswordFinalComponent),
+  },
+];
 
-  // FIRST ACCESS ADMIN → TENANT DETAILS
- {
-  path: 'tenant-first-access',
-  canActivate: [AuthGuard, OnboardingGuard],
-  loadComponent: () => import('./auth/tenant-first-access/tenant-first-access').then(m => m.TenantFirstAccessComponent)
-},
-
-
-  // FIRST ACCESS HOST/COHOST → USER DETAILS
+// Rotte di onboarding / first access (protette ma senza layout principale)
+const onboardingRoutes: Routes = [
+  {
+    path: 'tenant-first-access',
+    canActivate: [AuthGuard, OnboardingGuard],
+    loadComponent: () =>
+      import('./auth/tenant-first-access/tenant-first-access')
+        .then(m => m.TenantFirstAccessComponent),
+  },
   {
     path: 'user-first-access',
     canActivate: [AuthGuard, OnboardingGuard],
-    loadComponent: () => import('./auth/user-first-access/user-first-access').then(m => m.UserFirstAccess)
+    loadComponent: () =>
+      import('./auth/user-first-access/user-first-access')
+        .then(m => m.UserFirstAccess),
   },
+];
 
-
-  // PAGINA PROTETTA
+// Rotte protette con layout principale
+const protectedWithLayoutRoutes: Routes = [
   {
-    path: 'previsione',
-    component: PrevisioneGuadagno,
-    canActivate: [AuthGuard, RoleGuard, OnboardingGuard],
-    data: { roleId: [2,1]}, // ADMIN
+    path: '',
+    loadComponent: () =>
+      import('./layout/main-layout/main-layout').then(m => m.MainLayout),
+    canActivate: [AuthGuard, OnboardingGuard],
+    children: [
+      {
+        path: 'registration',
+        loadComponent: () =>
+          import('./auth/registrationComponent/registration')
+            .then(m => m.RegistrationComponent),
+      },
+      {
+        path: 'home',
+        loadComponent: () =>
+          import('./components/home/home')
+            .then(m => m.HomeComponent),
+      },
+      {
+        path: 'previsione',
+        loadComponent: () =>
+          import('./components/previsione-guadagno/previsione-guadagno')
+            .then(m => m.PrevisioneGuadagno),
+        canActivate: [RoleGuard],
+        data: {
+          allowedRoles: [1, 2], // 1 = OWNER, 2 = ADMIN (esempio)
+          feature: 'previsione-guadagno',
+        },
+      },
+      {
+        path: 'not-authorized',
+        loadComponent: () =>
+          import('./auth/not-authorized/not-authorized')
+            .then(m => m.NotAuthorizedComponent),
+      },
+    ],
   },
+];
 
-  // NOT AUTHORIZED
+// Configurazione principale delle rotte
+export const routes: Routes = [
+  ...publicRoutes,
+  ...onboardingRoutes,
+  ...protectedWithLayoutRoutes,
   {
-    path: 'not-authorized',
-    loadComponent: () => import('./auth/not-authorized/not-authorized').then(m => m.NotAuthorizedComponent),
+    path: '**',
+    redirectTo: '',
   },
-  {
-  path: 'reset-password-final',
-  loadComponent: () =>
-    import('./auth/reset-password-final/reset-password-final')
-      .then(m => m.ResetPasswordFinalComponent),
-},
-
-  { path: '**', redirectTo: '' },
 ];

@@ -28,6 +28,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   // Se la chiamata è protetta ma non c’è token → blocco e rimando al login
   if (!token) {
     alert('Sessione scaduta. Effettua nuovamente il login.');
+    tokenStorage.clear();
     router.navigateByUrl('/');
     throw new Error('Token mancante per endpoint protetto');
   }

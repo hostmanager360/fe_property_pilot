@@ -11,6 +11,7 @@ export const AuthGuard: CanActivateFn = () => {
 
   // 1. Non loggato
   if (!token) {
+    tokenStorage.clear();
     router.navigateByUrl('/');
     return false;
   }

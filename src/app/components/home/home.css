@@ -1,0 +1,134 @@
+/* ===========================
+   CONTAINER PRINCIPALE
+=========================== */
+.home-container {
+  padding: 32px;
+  color: white;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+.home-header {
+  text-align: center; /* centra tutto */
+  margin-bottom: 24px;
+}
+
+.home-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: black; /* stesso colore delle card */
+}
+
+.subtitle {
+  margin-top: -6px;
+  opacity: 0.85;
+  font-size: 1.1rem;
+  color: black; /* stesso colore delle card */
+}
+/* ===========================
+   LAYOUT CARDS
+=========================== */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+/* ===========================
+   CARD
+=========================== */
+.card {
+  background: #1a1a1d;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 12px;
+  padding: 24px;
+  width: 320px; /* Manteniamo la tua dimensione */
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
+}
+
+/* ===========================
+   ICONA
+=========================== */
+.card-icon {
+  background: rgba(212, 175, 55, 0.15);
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible; /* evita tagli */
+  margin-bottom: 16px;
+}
+
+.card-icon mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  line-height: 1;
+  color: #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===========================
+   TESTI CARD
+=========================== */
+.card h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.card p {
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+
+/* ===========================
+   LINK CARD
+=========================== */
+.card-link {
+  color: var(--gold);
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.card:hover .card-link {
+  color: white;
+}
+
+/* ===========================
+   FOOTER
+=========================== */
+footer {
+  margin-top: 40px;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 768px) {
+  .cards {
+    justify-content: center;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 360px;
+  }
+}

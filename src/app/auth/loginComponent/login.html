@@ -2,13 +2,13 @@
   <div class="auth-overlay"></div>
 
   <div class="brand">
-    <img class="brand-logo" src="assets/propertypilot-logo.png" alt="PropertyPilot logo" />
+    <img class="brand-logo" src="assets/IMG-LOGO-SFONDO.png" alt="PropertyPilot logo" />
     <div class="brand-title">PropertyPilot</div>
     <div class="brand-subtitle">Create • Manage • Scale</div>
   </div>
 
   <mat-card class="auth-card" appearance="outlined">
-    <mat-card-header class="auth-header">
+    <mat-card-header class="auth-header auth-header-center">
       <mat-card-title>Benvenuto</mat-card-title>
       <mat-card-subtitle>Accedi per continuare</mat-card-subtitle>
     </mat-card-header>
@@ -61,9 +61,10 @@
           }
         </mat-form-field>
 
-        <a class="register-link" routerLink="/registration">
-          Non sei registrato? <span class="register-cta">clicca qui.</span>
+        <a class="register-link" (click)="onRegisterClick()">
+          Non sei registrato? <span class="register-cta">Crea un account</span>
         </a>
+
 
         <!-- SUBMIT BUTTON -->
         <button mat-flat-button color="primary" class="primary-btn" type="submit" [disabled]="isSubmitting">

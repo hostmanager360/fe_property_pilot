@@ -1,0 +1,30 @@
+/* Layout container */
+.layout-container {
+  min-height: calc(100vh - var(--header-height));
+  background: var(--background-color);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Content area */
+.layout-content {
+  flex: 1;
+  padding: var(--content-padding-desktop);
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Responsività */
+@media (max-width: 1024px) {
+  .layout-content {
+    max-width: 100%;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-content {
+    padding: var(--content-padding-mobile);
+  }
+}

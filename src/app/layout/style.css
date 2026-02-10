@@ -1,0 +1,15 @@
+:root {
+  --header-height: 200px;
+
+  --gold: #d4af37;
+  --text: rgba(255, 255, 255, 0.92);
+  --bg: linear-gradient(135deg, #0b0c0f, #14161b);
+  --gold-light: #f5e6b3;
+  --content-padding-desktop: 24px;
+  --content-padding-mobile: 16px;
+  --background-color: #0b0b0d;
+}
+:host ::ng-deep mat-toolbar {
+  height: var(--header-height) !important;
+  min-height: var(--header-height) !important;
+}

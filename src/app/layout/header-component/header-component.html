@@ -1,0 +1,87 @@
+<mat-toolbar class="pp-toolbar">
+
+  <!-- LEFT: Logo + Brand -->
+  <div class="pp-left" (click)="goHome()">
+    <img src="assets/IMG-LOGO-SFONDO.png" class="pp-logo" />
+    <span class="pp-brand">PropertyPilot</span>
+  </div>
+
+  <span class="pp-spacer"></span>
+
+  <!-- DESKTOP MENU -->
+  <nav class="pp-menu desktop-menu">
+    <a mat-button routerLink="/home" routerLinkActive="active-tab">Home</a>
+    <a mat-button routerLink="/previsione" routerLinkActive="active-tab">Previsione</a>
+  </nav>
+
+  <!-- USER ICON ONLY -->
+  <button mat-icon-button [matMenuTriggerFor]="userMenu" class="pp-user-icon desktop-menu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+
+  <!-- MOBILE MENU BUTTON -->
+  <button mat-icon-button [matMenuTriggerFor]="mobileMenu" class="mobile-menu-btn">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+</mat-toolbar>
+
+<!-- USER MENU (DESKTOP) -->
+<mat-menu #userMenu="matMenu">
+
+  <!-- USERNAME FIRST -->
+  <div class="user-menu-header">
+    <mat-icon>person</mat-icon>
+    <span>{{ email }}</span>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <button mat-menu-item (click)="goUserInfo()">
+    <mat-icon>info</mat-icon>
+    <span>Info utente</span>
+  </button>
+
+  <button mat-menu-item (click)="goCreateUser()">
+    <mat-icon>person_add</mat-icon>
+    <span>Crea utenza</span>
+  </button>
+
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Logout</span>
+  </button>
+
+</mat-menu>
+
+<!-- MOBILE MENU DROPDOWN -->
+<mat-menu #mobileMenu="matMenu">
+
+  <button mat-menu-item routerLink="/home">
+    <mat-icon>home</mat-icon>
+    <span>Home</span>
+  </button>
+
+  <button mat-menu-item routerLink="/previsione">
+    <mat-icon>trending_up</mat-icon>
+    <span>Previsione</span>
+  </button>
+
+  <mat-divider></mat-divider>
+
+  <button mat-menu-item (click)="goUserInfo()">
+    <mat-icon>info</mat-icon>
+    <span>Info utente</span>
+  </button>
+
+  <button mat-menu-item (click)="goCreateUser()">
+    <mat-icon>person_add</mat-icon>
+    <span>Crea utenza</span>
+  </button>
+
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Logout</span>
+  </button>
+
+</mat-menu>

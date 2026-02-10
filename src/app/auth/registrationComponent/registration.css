@@ -74,7 +74,7 @@
 /* ===== Card ===== */
 .auth-card {
   transform: scale(0.90);
-  width: min(420px, 92vw);
+  width: min(480px, 92vw);
   position: relative;
   z-index: 1;
   border-radius: 30px;

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 import { CommonModule } from '@angular/common';
 
@@ -20,8 +21,7 @@ import { LoginRequest } from '../../model/auth/LoginRequest';
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule,        // NECESSARIO per @if
-    RouterLink,
+    CommonModule, 
     ReactiveFormsModule,
 
     MatCardModule,
@@ -94,20 +94,94 @@ export class LoginComponent {
           } else if(this.onBoardingStep === "2") {
             this.router.navigateByUrl('/user-first-access');
           } else if(this.onBoardingStep === "3") {
-            this.router.navigateByUrl('/previsione');
+            this.router.navigateByUrl('/home');
           }
           
           return;
         } else {
-          this.router.navigateByUrl('/previsione');
+          this.router.navigateByUrl('/home');
         }
 
         
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage = err.error?.message || 'Credenziali non valide.';
+        this.handleLoginError(err);
       },
     });
   }
+
+  onRegisterClick() {
+  const loggedIn = this.tokenStorage.isLogged(); 
+
+  if (!loggedIn) {
+    Swal.fire({
+      title: 'Accesso richiesto',
+      text: 'Effettua il login per poter registrare una nuova utenza.',
+      icon: 'warning',
+      confirmButtonText: 'Ok',
+      confirmButtonColor: '#d4af37',
+      background: '#121216',
+      color: '#fff'
+    });
+    return;
+  }
+
+  // Se è loggato → procedi normalmente
+    this.router.navigate(['/registration']);
+  }
+  private handleLoginError(err: any) {
+  const code = err.error?.code;
+
+  switch (code) {
+
+    case 1001: // Utente non trovato
+      Swal.fire({
+        title: 'Utente non trovato',
+        text: 'L’email inserita non risulta registrata.',
+        icon: 'warning',
+        confirmButtonColor: '#d4af37',
+        background: '#121216',
+        color: '#fff'
+      });
+      break;
+
+    case 1002: // Credenziali errate
+      Swal.fire({
+        title: 'Credenziali non valide',
+        text: 'La password inserita non è corretta.',
+        icon: 'error',
+        confirmButtonColor: '#d4af37',
+        background: '#121216',
+        color: '#fff'
+      });
+      break;
+
+    case 1003: // Password reset obbligatorio
+      Swal.fire({
+        title: 'Reimpostazione necessaria',
+        text: 'Per continuare devi reimpostare la password.',
+        icon: 'info',
+        confirmButtonColor: '#d4af37',
+        background: '#121216',
+        color: '#fff'
+      }).then(() => {
+        this.router.navigateByUrl('/reset-password');
+      });
+      break;
+
+    case 1999: // Errore interno
+    default:
+      Swal.fire({
+        title: 'Errore interno',
+        text: 'Si è verificato un errore inatteso. Riprova più tardi.',
+        icon: 'error',
+        confirmButtonColor: '#d4af37',
+        background: '#121216',
+        color: '#fff'
+      });
+      break;
+  }
+}
+
 }
