@@ -6,7 +6,8 @@
   flex-direction:column;
   border-radius: 22px;
   overflow: hidden; /* per topbar e blur footer */
-  background: #f6f2e3;
+  background:white;
+  max-height: min(90vh, calc(100dvh - 24px));
 }
 
 @media (max-width: 900px){
@@ -149,9 +150,12 @@
 
 /* Content */
 .content{
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 8px 20px 14px 20px;
-  overflow:auto;
-  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: none;
 }
 
 /* KPI */
@@ -225,11 +229,18 @@
   gap: 12px;
 }
 
+.span-2{ grid-column: span 2; }
+
 .info-card{
   border-radius: 16px;
   padding: 12px;
   background: rgba(255,255,255,0.85);
   border: 1px solid rgba(0,0,0,0.06);
+}
+
+.info-card.owner-cost{
+  background: rgba(244, 67, 54, 0.06);
+  border-color: rgba(244, 67, 54, 0.16);
 }
 
 .label{
@@ -243,6 +254,55 @@
   font-size: 14px;
   font-weight: 900;
   word-break: break-word;
+}
+
+.hint{
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: .65;
+}
+
+.error-box{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(244,67,54,0.08);
+  border: 1px solid rgba(244,67,54,0.18);
+}
+
+.error-box mat-icon{ margin-top: 1px; }
+.err-title{ font-weight: 950; }
+.err-msg{ opacity: .75; font-size: 13px; }
+
+.skeleton{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.sk-line{
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.04));
+}
+
+.w60{ width: 60%; }
+.w80{ width: 80%; }
+.w90{ width: 90%; }
+
+.sk-grid{
+  margin-top: 8px;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sk-card{
+  height: 80px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.04));
 }
 
 /* Footer */
@@ -292,6 +352,13 @@
   .sub{ max-width: 100%; }
   .kpi-row{ grid-template-columns: 1fr; }
   .info-grid{ grid-template-columns: 1fr; }
+  .span-2{ grid-column: span 1; }
+  .sk-grid{ grid-template-columns: 1fr; }
   .footer{ justify-content: stretch; }
   .footer button{ flex: 1; }
+}
+
+/* Evita doppio scroll: il contenuto scrolla internamente, il surface no */
+:host-context(.dialog-responsive) ::ng-deep .mdc-dialog__surface {
+  overflow: hidden !important;
 }

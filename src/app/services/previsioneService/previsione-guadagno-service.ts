@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, catchError, map, Observable, tap, throwError } from 'rxjs';
@@ -11,6 +11,7 @@ import { PrevisioneGuadagnoList } from '../../model/PrevisioneGuadagnoList';
 })
 export class PrevisioneGuadagnoService {
   private apiUrl = 'http://localhost:8080/api/core/private/previsione-guadagno/';
+  private pdfApiUrl = 'http://localhost:8080/api/core/private/pdf/';
   private readonly _refreshList$ = new BehaviorSubject<void>(undefined);
   readonly refreshList$ = this._refreshList$.asObservable();
   constructor(private http: HttpClient) {}
@@ -68,6 +69,21 @@ export class PrevisioneGuadagnoService {
       }),
       catchError(err => {
         console.error('Errore chiamata deleteById:', err);
+        return throwError(() => err);
+      })
+    );
+}
+
+downloadPdfById(id: number): Observable<HttpResponse<Blob>> {
+  return this.http
+    .get(this.pdfApiUrl + 'downloadPrevisione', {
+      params: { id },
+      observe: 'response',
+      responseType: 'blob',
+    })
+    .pipe(
+      catchError(err => {
+        console.error('Errore chiamata downloadPdfById:', err);
         return throwError(() => err);
       })
     );

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -14,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-previsione-guadagno',
@@ -27,6 +29,7 @@ import { MatDialogRef } from '@angular/material/dialog';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
+    MatSnackBarModule,
   ],
   templateUrl: './previsione-guadagno.html',
   styleUrl: './previsione-guadagno.css',
@@ -38,11 +41,13 @@ export class PrevisioneGuadagno {
   private readonly dialogRef = inject(MatDialogRef<PrevisioneGuadagno>, {
     optional: true,
   });
+  private readonly snackBar = inject(MatSnackBar);
 
   previsione: PrevisioneGuadagnoDto = new PrevisioneGuadagnoDto();
   risultato: PrevisioneGuadagnoDto | null = null;
 
   loading = false;
+  downloading = false;
   errorMessage: string | null = null;
 
   // -----------------------
@@ -148,6 +153,76 @@ export class PrevisioneGuadagno {
 
   close(): void {
     this.dialogRef?.close();
+  }
+
+  downloadPdf(): void {
+    const id = this.risultato?.id ?? this.previsione?.id;
+    if (!id || this.loading || this.downloading) {
+      this.snackBar.open('Download non disponibile: id previsione mancante.', 'Chiudi', {
+        duration: 3500,
+      });
+      return;
+    }
+
+    this.downloading = true;
+    this.cdr.markForCheck();
+
+    this.service
+      .downloadPdfById(id)
+      .pipe(
+        finalize(() => {
+          this.downloading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          const body = response.body;
+          if (!body || body.size === 0) {
+            this.snackBar.open('Il backend ha risposto senza contenuto PDF.', 'Chiudi', {
+              duration: 4000,
+            });
+            return;
+          }
+
+          const filename = this.extractFilename(response) ?? `previsione-${id}.pdf`;
+          this.saveBlob(body, filename);
+        },
+        error: (err) => {
+          this.snackBar.open(
+            err?.message || 'Errore durante il download del PDF.',
+            'Chiudi',
+            { duration: 5000 }
+          );
+        },
+      });
+  }
+
+  private extractFilename(response: HttpResponse<Blob>): string | null {
+    const contentDisposition =
+      response.headers.get('content-disposition') ??
+      response.headers.get('Content-Disposition');
+
+    if (!contentDisposition) {
+      return null;
+    }
+
+    const utf8Match = /filename\*\s*=\s*UTF-8''([^;]+)/i.exec(contentDisposition);
+    if (utf8Match?.[1]) {
+      return decodeURIComponent(utf8Match[1]).replace(/["']/g, '');
+    }
+
+    const asciiMatch = /filename\s*=\s*("?)([^";]+)\1/i.exec(contentDisposition);
+    return asciiMatch?.[2] ?? null;
+  }
+
+  private saveBlob(blob: Blob, filename: string): void {
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(blobUrl);
   }
   private n(v: number | null | undefined): number {
   const x = Number(v);

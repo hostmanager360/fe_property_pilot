@@ -382,6 +382,17 @@
           <mat-icon>edit</mat-icon>
           Nuovo calcolo
         </button>
+
+        <button
+          mat-raised-button
+          class="btn-gold"
+          type="button"
+          (click)="downloadPdf()"
+          [disabled]="loading || downloading || !risultato.id"
+        >
+          <mat-icon>download</mat-icon>
+          Download PDF
+        </button>
       </div>
 
     </div>

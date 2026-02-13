@@ -1,4 +1,5 @@
 export class PrevisioneGuadagnoDto {
+  id?: number;
   nomeAppartamento = '';
   indirizzo = '';
 
@@ -29,6 +30,7 @@ export class PrevisioneGuadagnoDto {
   totaleLordoPernottamenti?: number;
   totaleLordoGestione?: number;
   totaleCostoPulizia?: number;
+  totaleCostoPulizie?: number;
   totaleNettoProprietario?: number;
   totaleCommissioneHost?: number;
   totaleCommissioneCoHost?: number;

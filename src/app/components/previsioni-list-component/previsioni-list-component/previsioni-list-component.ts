@@ -32,8 +32,8 @@ import Swal from 'sweetalert2';
 
 import { PrevisioneGuadagnoList } from '../../../model/PrevisioneGuadagnoList';
 import { PrevisioneGuadagnoService } from '../../../services/previsioneService/previsione-guadagno-service';
-import { PrevisioneDettaglioDialogComponent } from '../../previsione-dettaglio-dialog/previsione-dettaglio-dialog';
-import { PrevisioneGuadagno } from '../../previsione-guadagno/previsione-guadagno';
+import { PrevisioneDettaglioDialogComponent } from '../../../components/previsione-dettaglio-dialog/previsione-dettaglio-dialog';
+import { PrevisioneGuadagno } from '../../../components/previsione-guadagno/previsione-guadagno';
 
 type ViewState = {
   loading: boolean;
