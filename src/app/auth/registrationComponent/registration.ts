@@ -101,10 +101,21 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     );
   }
 
-  readonly email = this.form?.get('email');
-  readonly role = this.form?.get('role');
-  readonly password = this.form?.get('password');
-  readonly confirmPassword = this.form?.get('confirmPassword');
+  get email(): AbstractControl | null {
+    return this.form?.get('email') ?? null;
+  }
+
+  get role(): AbstractControl | null {
+    return this.form?.get('role') ?? null;
+  }
+
+  get password(): AbstractControl | null {
+    return this.form?.get('password') ?? null;
+  }
+
+  get confirmPassword(): AbstractControl | null {
+    return this.form?.get('confirmPassword') ?? null;
+  }
 
   private static passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
     const pass = group.get('password')?.value;
@@ -169,7 +180,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     return allRoles
       .filter(r => allowedCodes.includes(r.code))
       .map(r => ({
-        value: r.id,
+        value: r.code,
         label: r.code
       }));
   }

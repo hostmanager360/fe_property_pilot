@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   OnInit,
   inject,
 } from '@angular/core';
@@ -15,7 +16,7 @@ import { Router } from '@angular/router';
 import { CurrencyPipe, NgClass } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { finalize } from 'rxjs';
+import { finalize, firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 
 import { PrevisioneGuadagnoService } from '../../services/previsioneService/previsione-guadagno-service';
@@ -41,11 +42,13 @@ export class PrevisioneDettaglioDialogComponent implements OnInit {
   private readonly service = inject(PrevisioneGuadagnoService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
+  private readonly hostRef = inject(ElementRef<HTMLElement>);
 
   readonly input = inject<DialogData>(MAT_DIALOG_DATA);
 
   loading = true;
   downloading = false;
+  sendingEmail = false;
   error: string | null = null;
   dto: PrevisioneGuadagnoDto | null = null;
 
@@ -146,6 +149,117 @@ export class PrevisioneDettaglioDialogComponent implements OnInit {
       });
   }
 
+  async inviaEmail(): Promise<void> {
+    if (this.loading || this.sendingEmail || this.error) {
+      return;
+    }
+
+    const previsioneId = this.dto?.id ?? this.input.id;
+    if (!previsioneId) {
+      await this.showSwal({
+        icon: 'error',
+        title: 'Errore',
+        text: 'ID previsione non disponibile.',
+      });
+      return;
+    }
+
+    (document.activeElement as HTMLElement | null)?.blur();
+
+    const result = await Swal.fire({
+      title: 'Invia previsione via email',
+      html: `
+        <input id="swal-owner-name" class="swal2-input" placeholder="Nome proprietario" />
+        <input id="swal-owner-email" class="swal2-input" type="email" placeholder="Email proprietario" />
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Invia',
+      cancelButtonText: 'Annulla',
+      confirmButtonColor: '#d4af37',
+      cancelButtonColor: '#888888',
+      showLoaderOnConfirm: true,
+      width: 'auto',
+      heightAuto: false,
+      scrollbarPadding: false,
+      returnFocus: false,
+      target: this.getSwalTarget(),
+      customClass: {
+        popup: 'pp-swal',
+      },
+      didOpen: () => {
+        const popup = Swal.getPopup();
+        if (popup) {
+          popup.style.maxWidth = '92vw';
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+      preConfirm: async () => {
+        this.sendingEmail = true;
+        this.cdr.markForCheck();
+        try {
+          const popup = Swal.getPopup();
+          const ownerName = String(
+            (popup?.querySelector('#swal-owner-name') as HTMLInputElement | null)?.value ?? ''
+          ).trim();
+          const ownerEmail = String(
+            (popup?.querySelector('#swal-owner-email') as HTMLInputElement | null)?.value ?? ''
+          ).trim();
+
+          if (!ownerName) {
+            Swal.showValidationMessage('Nome proprietario obbligatorio.');
+            return null;
+          }
+
+          if (!ownerEmail) {
+            Swal.showValidationMessage('Email obbligatoria.');
+            return null;
+          }
+
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(ownerEmail)) {
+            Swal.showValidationMessage('Inserisci una email valida.');
+            return null;
+          }
+
+          await firstValueFrom(
+            this.service.sendPrevisioneEmail({ previsioneId, ownerEmail, ownerName })
+          );
+          return { ok: true as const };
+        } catch (err) {
+          const mapped = await this.mapEmailError(err);
+          return { ok: false as const, mapped };
+        } finally {
+          this.sendingEmail = false;
+          this.cdr.markForCheck();
+        }
+      },
+    });
+
+    if (!result.isConfirmed || !result.value) {
+      return;
+    }
+
+    if (result.value.ok) {
+      await this.showSwal({
+        icon: 'success',
+        title: 'Email inviata',
+        text: 'La previsione è stata inviata al proprietario con il PDF in allegato.',
+      });
+      return;
+    }
+
+    const mapped = result.value.mapped;
+    await this.showSwal({
+      icon: mapped.icon,
+      title: mapped.title,
+      text: mapped.text,
+    });
+
+    if (mapped.code === 3002) {
+      void this.router.navigateByUrl('/');
+    }
+  }
+
   private async handleDownloadError(err: unknown): Promise<void> {
     const parsed = await this.parseBackendError(err);
     const code = parsed.code;
@@ -229,6 +343,77 @@ export class PrevisioneDettaglioDialogComponent implements OnInit {
     return { status, message: err.message };
   }
 
+  private async mapEmailError(err: unknown): Promise<{
+    code?: number;
+    icon: 'error' | 'warning' | 'info';
+    title: string;
+    text: string;
+  }> {
+    const parsed = await this.parseBackendError(err);
+    const code = parsed.code;
+
+    if (code === 4101) {
+      return {
+        code,
+        icon: 'error',
+        title: 'Previsione non trovata',
+        text: 'La previsione richiesta non esiste o è stata rimossa.',
+      };
+    }
+
+    if (code === 4102) {
+      return {
+        code,
+        icon: 'warning',
+        title: 'Accesso non consentito',
+        text: 'Non hai i permessi per scaricare questa previsione.',
+      };
+    }
+
+    if (code === 4103) {
+      return {
+        code,
+        icon: 'error',
+        title: 'Email non valida',
+        text: parsed.message || 'L’indirizzo email inserito non è valido.',
+      };
+    }
+
+    if (code === 4104) {
+      return {
+        code,
+        icon: 'error',
+        title: 'Invio non riuscito',
+        text: parsed.message || 'Impossibile inviare l’email in questo momento.',
+      };
+    }
+
+    if (code === 3002 || parsed.status === 401) {
+      return {
+        code: 3002,
+        icon: 'info',
+        title: 'Sessione scaduta',
+        text: "Effettua nuovamente l'accesso.",
+      };
+    }
+
+    if (code === 3001 || parsed.status === 403) {
+      return {
+        code,
+        icon: 'warning',
+        title: 'Accesso non consentito',
+        text: parsed.message || 'Non hai i permessi per inviare questa previsione.',
+      };
+    }
+
+    return {
+      code,
+      icon: 'error',
+      title: 'Errore',
+      text: 'Errore durante l’invio email.',
+    };
+  }
+
   private getFriendlyLoadError(err: unknown): string {
     if (err instanceof HttpErrorResponse) {
       if (err.status === 0) {
@@ -263,10 +448,12 @@ export class PrevisioneDettaglioDialogComponent implements OnInit {
   }
 
   private showSwal(params: {
-    icon: 'error' | 'warning' | 'info';
+    icon: 'success' | 'error' | 'warning' | 'info';
     title: string;
     text: string;
   }): Promise<unknown> {
+    (document.activeElement as HTMLElement | null)?.blur();
+
     return Swal.fire({
       icon: params.icon,
       title: params.title,
@@ -278,10 +465,17 @@ export class PrevisioneDettaglioDialogComponent implements OnInit {
       width: 'min(92vw, 420px)',
       heightAuto: false,
       scrollbarPadding: false,
+      returnFocus: false,
+      target: this.getSwalTarget(),
       customClass: {
         popup: 'pp-swal',
       },
     });
+  }
+
+  private getSwalTarget(): HTMLElement {
+    const dialogContainer = this.hostRef.nativeElement.closest('.mat-mdc-dialog-container');
+    return (dialogContainer as HTMLElement) || document.body;
   }
 
   private extractFilename(response: HttpResponse<Blob>): string | null {

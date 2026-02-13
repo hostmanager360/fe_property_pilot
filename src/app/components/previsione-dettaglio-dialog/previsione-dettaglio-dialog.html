@@ -191,9 +191,21 @@
       Chiudi
     </button>
 
+    <button
+      mat-raised-button
+      class="btn-gold"
+      (click)="inviaEmail()"
+      [disabled]="loading || !!error || sendingEmail"
+    >
+      <mat-icon>mail</mat-icon>
+      <span class="label-desktop">Invia Email</span>
+      <span class="label-mobile">Invia</span>
+    </button>
+
     <button mat-raised-button class="btn-gold" (click)="downloadPdf()" [disabled]="loading || !!error || downloading">
       <mat-icon>download</mat-icon>
-      Download PDF
+      <span class="label-desktop">Download PDF</span>
+      <span class="label-mobile">PDF</span>
     </button>
   </div>
 </div>

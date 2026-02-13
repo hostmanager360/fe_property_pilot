@@ -387,11 +387,24 @@
           mat-raised-button
           class="btn-gold"
           type="button"
+          (click)="inviaEmail()"
+          [disabled]="loading || sendingEmail || !(risultato.id || previsione.id)"
+        >
+          <mat-icon>mail</mat-icon>
+          <span class="label-desktop">Invia Email</span>
+          <span class="label-mobile">Invia</span>
+        </button>
+
+        <button
+          mat-raised-button
+          class="btn-gold"
+          type="button"
           (click)="downloadPdf()"
           [disabled]="loading || downloading || !risultato.id"
         >
           <mat-icon>download</mat-icon>
-          Download PDF
+          <span class="label-desktop">Download PDF</span>
+          <span class="label-mobile">PDF</span>
         </button>
       </div>
 

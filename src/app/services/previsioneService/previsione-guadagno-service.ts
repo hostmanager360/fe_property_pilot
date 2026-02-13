@@ -74,6 +74,27 @@ export class PrevisioneGuadagnoService {
     );
 }
 
+sendPrevisioneEmail(payload: {
+  previsioneId: number;
+  ownerEmail: string;
+  ownerName: string;
+}): Observable<void> {
+  return this.http
+    .post<any>(this.apiUrl + 'sendPrevisioneEmail', payload)
+    .pipe(
+      map((res) => {
+        if (res && res.success === false) {
+          throw res;
+        }
+        return;
+      }),
+      catchError(err => {
+        console.error('Errore chiamata sendPrevisioneEmail:', err);
+        return throwError(() => err);
+      })
+    );
+}
+
 downloadPdfById(id: number): Observable<HttpResponse<Blob>> {
   return this.http
     .get(this.pdfApiUrl + 'downloadPrevisione', {

@@ -329,6 +329,7 @@ mat-form-field{ width: 100%; }
   border-radius: 999px !important;
   padding: 10px 16px !important;
   border: none !important;
+  white-space: nowrap !important;
 }
 
 .btn-gold mat-icon{ color:#111 !important; }
@@ -345,6 +346,9 @@ mat-form-field{ width: 100%; }
 .btn-gold.is-disabled mat-icon{
   color: rgba(17, 17, 17, 0.55) !important;
 }
+
+.label-mobile{ display: none; }
+.label-desktop{ display: inline; }
 
 /* animation */
 .animate-in{
@@ -373,6 +377,8 @@ mat-form-field{ width: 100%; }
   .kpi-row{ grid-template-columns: 1fr; }
   .footer{ justify-content: stretch; }
   .footer button{ flex: 1; }
+  .label-desktop{ display: none; }
+  .label-mobile{ display: inline; }
 }
 
 /* ===== Material focus color -> ORO (solo dentro questo dialog) ===== */

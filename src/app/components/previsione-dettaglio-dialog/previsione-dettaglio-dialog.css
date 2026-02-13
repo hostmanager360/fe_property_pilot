@@ -324,9 +324,13 @@
   border-radius: 999px !important;
   padding: 10px 16px !important;
   border: none !important;
+  white-space: nowrap !important;
 }
 
 .btn-gold mat-icon{ color:#111 !important; }
+
+.label-mobile{ display: none; }
+.label-desktop{ display: inline; }
 
 /* 3) ANIMAZIONE APERTURA */
 .animate-in{
@@ -356,6 +360,8 @@
   .sk-grid{ grid-template-columns: 1fr; }
   .footer{ justify-content: stretch; }
   .footer button{ flex: 1; }
+  .label-desktop{ display: none; }
+  .label-mobile{ display: inline; }
 }
 
 /* Evita doppio scroll: il contenuto scrolla internamente, il surface no */
