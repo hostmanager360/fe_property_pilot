@@ -1,23 +1,29 @@
 export class PrevisioneGuadagnoDto {
- nomeAppartamento = '';
+  nomeAppartamento = '';
   indirizzo = '';
-  numeroLocali = 0;
-  numeroBagni = 0;
-  mutuoAffitto = 0;
+
+  numeroLocali: number | null = null;
+  numeroBagni: number | null = null;
+
+  mutuoAffitto: number | null = null;
+  costoUtenzeMensili: number | null = null;
+  costoPulizia: number | null = null;
+
+  numeroPrenotazioni: number | null = null;
+  numeroNottiMensili: number | null = null;
+  prezzoMedioPerNotte: number | null = null;
+
+  costoTasse: number | null = null;
+  costoPiattaforma: number | null = null;
+
   tipoGestione = '';
-  costoUtenzeMensili = 0;
-  costoPulizia = 0;
-  numeroPrenotazioni = 0;
-  numeroNottiMensili = 0;
-  prezzoMedioPerNotte = 0;
-
-  costoTasse = 0;
-  costoPiattaforma = 0;
   appartamentoDiretto = false;
-  commissioneGestioneTotale = 0;
-  commissioneCoHost = 0;
-  commissioneHost = 0;
 
+  commissioneGestioneTotale: number | null = null;
+  commissioneCoHost: number | null = null;
+  commissioneHost: number | null = null;
+
+  // risultati dal BE ok optional
   totaleCostoTassa?: number;
   totaleCostoPiattaforma?: number;
   totaleLordoPernottamenti?: number;

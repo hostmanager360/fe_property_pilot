@@ -1,5 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -7,16 +6,14 @@ import { finalize } from 'rxjs';
 import { PrevisioneGuadagnoDto } from '../../model/PrevisioneGuadagnoDto';
 import { PrevisioneGuadagnoService } from '../../services/previsioneService/previsione-guadagno-service';
 
-// Angular Material
-import { MatCardModule } from '@angular/material/card';
+// Material
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-previsione-guadagno',
@@ -24,110 +21,156 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   imports: [
     CommonModule,
     FormsModule,
-    HttpClientModule,
-    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatCheckboxModule,
     MatButtonModule,
-    MatDividerModule,
     MatIconModule,
     MatProgressBarModule,
   ],
   templateUrl: './previsione-guadagno.html',
   styleUrl: './previsione-guadagno.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrevisioneGuadagno {
+  private readonly service = inject(PrevisioneGuadagnoService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly dialogRef = inject(MatDialogRef<PrevisioneGuadagno>, {
+    optional: true,
+  });
+
   previsione: PrevisioneGuadagnoDto = new PrevisioneGuadagnoDto();
-  risultato?: PrevisioneGuadagnoDto;
+  risultato: PrevisioneGuadagnoDto | null = null;
 
   loading = false;
   errorMessage: string | null = null;
 
-  constructor(
-    private service: PrevisioneGuadagnoService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  // -----------------------
+  // UI helpers
+  // -----------------------
+  get isProfit(): boolean {
+    return (this.risultato?.totaleNettoProprietario ?? 0) >= 0;
+  }
 
+  get profitLabel(): string {
+    return this.isProfit ? 'Profitto' : 'Perdita';
+  }
+
+  /**
+   * Se Co-host è realmente usato (percentuale > 0) e siamo in modalità cohost,
+   * allora nel risultato mostriamo split Host + Co-host.
+   * Se diretta -> mostriamo solo Lordo gestione.
+   */
+  get showHostSplit(): boolean {
+    const isCohost = this.previsione.tipoGestione === 'cohost';
+    const cohostPct = Number(this.previsione.commissioneCoHost ?? 0);
+    return isCohost && cohostPct > 0;
+  }
+
+  // -----------------------
+  // Actions
+  // -----------------------
   calcola(): void {
     this.loading = true;
     this.errorMessage = null;
-    this.risultato = undefined;
+    this.risultato = null;
+    this.cdr.markForCheck();
 
-    // Forzo un primo refresh: fa sparire/mostrare subito la progress bar
-    this.cdr.detectChanges();
-
-    // sicurezza: se non diretta, aggiorno totale gestione prima di inviare
     this.ricalcolaTotaleGestione();
-
+    this.normalizeForBackend();
+    this.ricalcolaTotaleGestione();
     this.service
       .calcola(this.previsione)
       .pipe(
         finalize(() => {
-          // finalize gira sia in success che in error: spegne sempre il loading
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (data) => {
           this.risultato = data;
-
-          // IMPORTANTISSIMO: forza l’aggiornamento immediato della view
-          // (evita il “devo cliccare un input per vedere i risultati”)
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         },
         error: (err) => {
-          this.errorMessage =
-            err?.message || 'Si è verificato un errore durante il calcolo.';
+          this.errorMessage = err?.message || 'Si è verificato un errore durante il calcolo.';
           console.error('Errore chiamata:', err);
-
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         },
       });
   }
 
   onTipoGestioneChange(): void {
-    // Se diretta: azzero host/cohost (non servono)
     if (this.previsione.tipoGestione === 'diretta') {
-      this.previsione.commissioneHost = this.previsione.commissioneGestioneTotale;
+      this.previsione.appartamentoDiretto = true;
+      // se diretta: cohost non serve
       this.previsione.commissioneCoHost = 0 as any;
+      this.cdr.markForCheck();
       return;
     }
 
-    // Se NON diretta: totale = host + cohost (evito NaN)
-    this.previsione.commissioneHost = (this.previsione.commissioneHost ?? 0) as any;
-    this.previsione.commissioneCoHost = (this.previsione.commissioneCoHost ?? 0) as any;
-    this.ricalcolaTotaleGestione();
+    if (this.previsione.tipoGestione === 'cohost') {
+      this.previsione.appartamentoDiretto = false;
+      this.previsione.commissioneHost = (this.previsione.commissioneHost ?? 0) as any;
+      this.previsione.commissioneCoHost = (this.previsione.commissioneCoHost ?? 0) as any;
+      this.ricalcolaTotaleGestione();
+      this.cdr.markForCheck();
+    }
   }
 
   ricalcolaTotaleGestione(): void {
     if (this.previsione.tipoGestione === 'diretta') {
-      this.previsione.commissioneHost = this.previsione.commissioneGestioneTotale;
-      this.previsione.appartamentoDiretto == true;
+      this.previsione.appartamentoDiretto = true;
+      return;
     }
 
     const host = Number(this.previsione.commissioneHost ?? 0);
     const cohost = Number(this.previsione.commissioneCoHost ?? 0);
-
     this.previsione.commissioneGestioneTotale = (host + cohost) as any;
   }
 
   nuovoCalcolo(): void {
-    this.risultato = undefined;
+    this.risultato = null;
     this.errorMessage = null;
     this.previsione = new PrevisioneGuadagnoDto();
     this.loading = false;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   resetForm(form: any): void {
     form.resetForm();
     this.previsione = new PrevisioneGuadagnoDto();
-    this.risultato = undefined;
+    this.risultato = null;
     this.errorMessage = null;
     this.loading = false;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
+
+  close(): void {
+    this.dialogRef?.close();
+  }
+  private n(v: number | null | undefined): number {
+  const x = Number(v);
+  return Number.isFinite(x) ? x : 0;
 }
+
+private normalizeForBackend(): void {
+  this.previsione.numeroLocali = this.n(this.previsione.numeroLocali);
+  this.previsione.numeroBagni = this.n(this.previsione.numeroBagni);
+  this.previsione.mutuoAffitto = this.n(this.previsione.mutuoAffitto);
+  this.previsione.costoUtenzeMensili = this.n(this.previsione.costoUtenzeMensili);
+  this.previsione.costoPulizia = this.n(this.previsione.costoPulizia);
+
+  this.previsione.numeroPrenotazioni = this.n(this.previsione.numeroPrenotazioni);
+  this.previsione.numeroNottiMensili = this.n(this.previsione.numeroNottiMensili);
+  this.previsione.prezzoMedioPerNotte = this.n(this.previsione.prezzoMedioPerNotte);
+
+  this.previsione.costoTasse = this.n(this.previsione.costoTasse);
+  this.previsione.costoPiattaforma = this.n(this.previsione.costoPiattaforma);
+
+  this.previsione.commissioneGestioneTotale = this.n(this.previsione.commissioneGestioneTotale);
+  this.previsione.commissioneHost = this.n(this.previsione.commissioneHost);
+  this.previsione.commissioneCoHost = this.n(this.previsione.commissioneCoHost);
+}
+}
+

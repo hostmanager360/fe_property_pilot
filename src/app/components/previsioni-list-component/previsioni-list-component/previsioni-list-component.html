@@ -1,0 +1,204 @@
+<div class="previsioni-container">
+  <div class="header-row">
+    <div class="header-text">
+      <h1>
+        <mat-icon class="header-icon">trending_up</mat-icon>
+        <span>Previsioni di Guadagno</span>
+      </h1>
+      <p class="subtitle">
+        Storico completo delle previsioni generate per i tuoi immobili.
+      </p>
+    </div>
+
+    <button class="previsioni-button" (click)="nuovaPrevisione()">
+      <mat-icon fontIcon="add_circle" class="icona"></mat-icon>
+      <span>Nuova previsione</span>
+    </button>
+  </div>
+
+  <mat-card class="table-card">
+    @if (state$ | async; as state) {
+      @if (state.loading) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
+
+      @if (state.error) {
+        <div class="error-state">
+          <mat-icon>error</mat-icon>
+          <span>{{ state.error }}</span>
+          <button mat-stroked-button (click)="load()">Riprova</button>
+        </div>
+      }
+
+      @if (!state.loading && !state.error) {
+        <div class="table-toolbar">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Cerca</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input
+              matInput
+              type="text"
+              name="searchTerm"
+              [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearchTermChange()"
+              placeholder="Appartamento, indirizzo, importi..."
+            />
+          </mat-form-field>
+
+          <div class="pager-group">
+            <div class="results-label">{{ getResultsLabel(state.data) }}</div>
+            <div class="pager">
+              <button
+                mat-icon-button
+                class="pager-btn"
+                (click)="prevPage(state.data)"
+                [disabled]="!canGoPrev(state.data)"
+                aria-label="Pagina precedente"
+                matTooltip="Pagina precedente"
+              >
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+
+              <span class="page-label">{{ getCurrentPageLabel(state.data) }}</span>
+
+              <button
+                mat-icon-button
+                class="pager-btn"
+                (click)="nextPage(state.data)"
+                [disabled]="!canGoNext(state.data)"
+                aria-label="Pagina successiva"
+                matTooltip="Pagina successiva"
+              >
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        @if (hasFilteredResults(state.data)) {
+          <div class="table-wrap desktop-only">
+            <table mat-table [dataSource]="getPagedData(state.data)" class="previsioni-table">
+              <ng-container matColumnDef="nomeAppartamento">
+                <th mat-header-cell *matHeaderCellDef>Appartamento</th>
+                <td mat-cell *matCellDef="let r">{{ r.nomeAppartamento }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="indirizzo">
+                <th mat-header-cell *matHeaderCellDef>Indirizzo</th>
+                <td mat-cell *matCellDef="let r">{{ r.indirizzo }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="numeroLocali">
+                <th mat-header-cell *matHeaderCellDef>Locali</th>
+                <td mat-cell *matCellDef="let r">{{ r.numeroLocali }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="numeroBagni">
+                <th mat-header-cell *matHeaderCellDef>Bagni</th>
+                <td mat-cell *matCellDef="let r">{{ r.numeroBagni }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="totaleLordoPernottamenti">
+                <th mat-header-cell *matHeaderCellDef>Lordo</th>
+                <td mat-cell *matCellDef="let r">
+                  {{ r.totaleLordoPernottamenti | currency:'EUR' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="totaleNettoProprietario">
+                <th mat-header-cell *matHeaderCellDef>Netto</th>
+                <td mat-cell *matCellDef="let r">
+                  {{ r.totaleNettoProprietario | currency:'EUR' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="dettaglio">
+                <th mat-header-cell *matHeaderCellDef>Dettaglio</th>
+                <td mat-cell *matCellDef="let r">
+                  <button
+                    mat-icon-button
+                    class="action-btn"
+                    (click)="apriDettaglio(r)"
+                    aria-label="Dettaglio"
+                    matTooltip="Dettaglio"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="elimina">
+                <th mat-header-cell *matHeaderCellDef>Elimina</th>
+                <td mat-cell *matCellDef="let r">
+                  <button
+                    mat-icon-button
+                    class="action-btn danger"
+                    (click)="eliminaPrevisione(r)"
+                    aria-label="Elimina"
+                    matTooltip="Elimina"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+
+          <div class="mobile-list mobile-only">
+            @for (r of getPagedData(state.data); track trackById($index, r)) {
+              <article class="mobile-card">
+                <div class="mobile-top">
+                  <div class="mobile-name">{{ r.nomeAppartamento }}</div>
+                  <div class="mobile-address">{{ r.indirizzo }}</div>
+                </div>
+
+                <div class="mobile-kpis">
+                  <div class="mobile-kpi">
+                    <span class="k">Locali</span>
+                    <span class="v">{{ r.numeroLocali }}</span>
+                  </div>
+                  <div class="mobile-kpi">
+                    <span class="k">Bagni</span>
+                    <span class="v">{{ r.numeroBagni }}</span>
+                  </div>
+                  <div class="mobile-kpi">
+                    <span class="k">Lordo</span>
+                    <span class="v">{{ r.totaleLordoPernottamenti | currency:'EUR' }}</span>
+                  </div>
+                  <div class="mobile-kpi">
+                    <span class="k">Netto</span>
+                    <span class="v">{{ r.totaleNettoProprietario | currency:'EUR' }}</span>
+                  </div>
+                </div>
+
+                <div class="mobile-actions">
+                  <button
+                    mat-stroked-button
+                    class="mobile-btn"
+                    (click)="apriDettaglio(r)"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                    Dettaglio
+                  </button>
+                  <button
+                    mat-stroked-button
+                    class="mobile-btn danger"
+                    (click)="eliminaPrevisione(r)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                    Elimina
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">Nessuna previsione trovata per la ricerca inserita.</div>
+        }
+      }
+    }
+  </mat-card>
+</div>

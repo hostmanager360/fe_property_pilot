@@ -1,0 +1,296 @@
+<div class="dialog-shell animate-in">
+  <div class="topbar"></div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="title">
+      <div class="title-icon">
+        <mat-icon>description</mat-icon>
+      </div>
+
+      <div class="title-text">
+        <div class="h1">Dettaglio previsione</div>
+
+        @if (dto) {
+          <div class="sub">
+            {{ dto.nomeAppartamento || '—' }} • {{ dto.indirizzo || '—' }}
+          </div>
+        } @else {
+          <div class="sub">Caricamento…</div>
+        }
+      </div>
+    </div>
+
+    @if (dto) {
+      <div class="status" [ngClass]="isProfit ? 'profit' : 'loss'">
+        <mat-icon>{{ isProfit ? 'trending_up' : 'trending_down' }}</mat-icon>
+        <span>{{ profitLabel }}</span>
+      </div>
+    }
+
+    <button
+      mat-icon-button
+      class="close-btn"
+      type="button"
+      (click)="close()"
+      aria-label="Chiudi popup"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  @if (loading) {
+    <div class="content">
+      <div class="skeleton">
+        <div class="sk-line w60"></div>
+        <div class="sk-line w90"></div>
+        <div class="sk-line w80"></div>
+
+        <div class="sk-grid">
+          @for (_ of [1,2,3,4,5,6]; track $index) {
+            <div class="sk-card"></div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+  @else {
+
+    <!-- ERROR -->
+    @if (error) {
+      <div class="content">
+        <div class="error-box">
+          <mat-icon>error</mat-icon>
+
+          <div class="err-text">
+            <div class="err-title">Errore</div>
+            <div class="err-msg">{{ error }}</div>
+          </div>
+
+          <button mat-raised-button class="btn-gold" (click)="load()">
+            Riprova
+          </button>
+        </div>
+      </div>
+    }
+    @else {
+
+      <!-- CONTENT -->
+      @if (dto) {
+        <div class="content">
+
+          <!-- META CHIPS -->
+          <div class="meta">
+            <div class="chip">
+              <mat-icon>home</mat-icon>
+              <span>{{ dto.numeroLocali }} locali</span>
+            </div>
+
+            <div class="chip">
+              <mat-icon>bathtub</mat-icon>
+              <span>{{ dto.numeroBagni }} bagni</span>
+            </div>
+
+            @if (dto.tipoGestione) {
+              <div class="chip">
+                <mat-icon>manage_accounts</mat-icon>
+                <span>{{ dto.tipoGestione }}</span>
+              </div>
+            }
+
+            @if (dto.appartamentoDiretto) {
+              <div class="chip">
+                <mat-icon>verified</mat-icon>
+                <span>Gestione diretta</span>
+              </div>
+            }
+          </div>
+
+          <!-- KPI -->
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-label">Lordo pernottamenti</div>
+              <div class="kpi-value">{{ lordo | currency:'EUR' }}</div>
+              <div class="kpi-hint">Ricavi totali stimati</div>
+            </div>
+
+            <div class="kpi-card highlight" [ngClass]="isProfit ? 'profit' : 'loss'">
+              <div class="kpi-label">Netto proprietario</div>
+              <div class="kpi-value">{{ netto | currency:'EUR' }}</div>
+              <div class="kpi-hint">{{ isProfit ? 'Risultato positivo' : 'Risultato negativo' }}</div>
+            </div>
+          </div>
+
+          <!-- SEZIONE: IMMOBILE -->
+          <div class="section">
+            <div class="section-title">
+              <mat-icon>apartment</mat-icon>
+              <span>Immobile</span>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-card">
+                <div class="label">Nome appartamento</div>
+                <div class="value">{{ dto.nomeAppartamento || '—' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Indirizzo</div>
+                <div class="value">{{ dto.indirizzo || '—' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Locali</div>
+                <div class="value">{{ dto.numeroLocali }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Bagni</div>
+                <div class="value">{{ dto.numeroBagni }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEZIONE: PRENOTAZIONI -->
+          <div class="section">
+            <div class="section-title">
+              <mat-icon>event</mat-icon>
+              <span>Prenotazioni</span>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-card">
+                <div class="label">Prenotazioni mensili</div>
+                <div class="value">{{ dto.numeroPrenotazioni }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Notti mensili</div>
+                <div class="value">{{ dto.numeroNottiMensili }}</div>
+              </div>
+
+              <div class="info-card span-2">
+                <div class="label">Prezzo medio per notte</div>
+                <div class="value">{{ dto.prezzoMedioPerNotte | currency:'EUR' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEZIONE: COSTI FISSI -->
+          <div class="section">
+            <div class="section-title">
+              <mat-icon>receipt_long</mat-icon>
+              <span>Costi fissi</span>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-card">
+                <div class="label">Mutuo / Affitto</div>
+                <div class="value">{{ dto.mutuoAffitto | currency:'EUR' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Utenze mensili</div>
+                <div class="value">{{ dto.costoUtenzeMensili | currency:'EUR' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Pulizia per soggiorno</div>
+                <div class="value">{{ dto.costoPulizia | currency:'EUR' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Totale pulizie</div>
+                <div class="value">{{ dto.totaleCostoPulizia | currency:'EUR' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEZIONE: PERCENTUALI -->
+          <div class="section">
+            <div class="section-title">
+              <mat-icon>percent</mat-icon>
+              <span>Percentuali</span>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-card">
+                <div class="label">Tasse</div>
+                <div class="value">{{ dto.costoTasse }}%</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Piattaforma</div>
+                <div class="value">{{ dto.costoPiattaforma }}%</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Gestione totale</div>
+                <div class="value">{{ dto.commissioneGestioneTotale }}%</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Host</div>
+                <div class="value">{{ dto.commissioneHost }}%</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Co-Host</div>
+                <div class="value">{{ dto.commissioneCoHost }}%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEZIONE: TOTALI CALCOLATI -->
+          <div class="section">
+            <div class="section-title">
+              <mat-icon>calculate</mat-icon>
+              <span>Totali calcolati</span>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-card">
+                <div class="label">Costo tasse</div>
+                <div class="value">{{ dto.totaleCostoTassa | currency:'EUR' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Costo piattaforma</div>
+                <div class="value">{{ dto.totaleCostoPiattaforma | currency:'EUR' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Lordo gestione</div>
+                <div class="value">{{ dto.totaleLordoGestione | currency:'EUR' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Commissione Host</div>
+                <div class="value">{{ dto.totaleCommissioneHost | currency:'EUR' }}</div>
+              </div>
+
+              <div class="info-card">
+                <div class="label">Commissione Co-Host</div>
+                <div class="value">{{ dto.totaleCommissioneCoHost | currency:'EUR' }}</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      }
+    }
+  }
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <button mat-stroked-button class="btn-gold" (click)="close()">
+      Chiudi
+    </button>
+
+    <button mat-raised-button class="btn-gold" (click)="downloadPdf()" [disabled]="loading || !!error">
+      <mat-icon>download</mat-icon>
+      Download PDF
+    </button>
+  </div>
+</div>

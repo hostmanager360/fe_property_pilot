@@ -1,170 +1,172 @@
-<!-- FORM: mostrato solo se NON ho risultato -->
-@if (!risultato) {
-  <mat-card class="page">
-    <mat-card-header>
-      <mat-card-title>Previsione guadagno</mat-card-title>
-      <mat-card-subtitle>Affitti brevi — inserisci i dati e calcola il netto</mat-card-subtitle>
-    </mat-card-header>
+<div class="dialog-shell animate-in">
 
-    <mat-card-content>
-      <form (ngSubmit)="calcola()" #form="ngForm" class="layout">
+  <!-- TOP BAR ORO -->
+  <div class="topbar"></div>
 
-        @if (loading) {
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        }
+  <!-- HEADER -->
+  <div class="header">
+    <div class="title">
+      <div class="title-icon">
+        <mat-icon>calculate</mat-icon>
+      </div>
 
-        @if (errorMessage) {
-          <div class="error">
-            <mat-icon>error</mat-icon>
-            <span>{{ errorMessage }}</span>
+      <div class="title-text">
+        <div class="h1">Previsione guadagno</div>
+
+        @if (!risultato) {
+          <div class="sub">
+            Affitti brevi • Inserisci i dati e calcola il netto stimato
+          </div>
+        } @else {
+          <div class="sub">
+            Risultato del calcolo • Riepilogo chiaro di ricavi, costi e commissioni
           </div>
         }
+      </div>
+    </div>
 
-        <!-- COLONNE -->
-        <div class="cols">
+    @if (risultato) {
+      <div class="status" [ngClass]="isProfit ? 'profit' : 'loss'">
+        <mat-icon>{{ isProfit ? 'trending_up' : 'trending_down' }}</mat-icon>
+        <span>{{ profitLabel }}</span>
+      </div>
+    }
 
-          <!-- COLONNA SINISTRA -->
+    <button
+      mat-icon-button
+      class="close-btn"
+      type="button"
+      (click)="close()"
+      aria-label="Chiudi popup"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  @if (loading) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  <!-- ERROR -->
+  @if (errorMessage) {
+    <div class="content">
+      <div class="error-box">
+        <mat-icon>error</mat-icon>
+        <div class="err-text">
+          <div class="err-title">Errore</div>
+          <div class="err-msg">{{ errorMessage }}</div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- FORM -->
+  @if (!risultato) {
+    <div class="content">
+      <form (ngSubmit)="calcola()" #form="ngForm" class="layout">
+
+        <!-- META CHIPS -->
+        <div class="meta">
+          @if (previsione.nomeAppartamento) {
+            <div class="chip">
+              <mat-icon>home</mat-icon>
+              <span>{{ previsione.nomeAppartamento }}</span>
+            </div>
+          }
+          @if (previsione.indirizzo) {
+            <div class="chip">
+              <mat-icon>location_on</mat-icon>
+              <span>{{ previsione.indirizzo }}</span>
+            </div>
+          }
+          @if (previsione.tipoGestione) {
+            <div class="chip">
+              <mat-icon>manage_accounts</mat-icon>
+              <span>{{ previsione.tipoGestione }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="two-col">
+
+          <!-- COLONNA A -->
           <div class="col">
 
-            <mat-card class="subcard">
-              <mat-card-title class="subcard-title">Dati appartamento</mat-card-title>
+            <div class="section">
+              <div class="section-title">
+                <mat-icon>apartment</mat-icon>
+                <span>Dati immobile</span>
+              </div>
 
-              <div class="grid-2">
-                <mat-form-field appearance="outline" class="col-2">
+              <div class="info-grid">
+                <mat-form-field appearance="outline" class="span-2">
                   <mat-label>Nome appartamento</mat-label>
-                  <input
-                    matInput
-                    type="text"
-                    name="nomeAppartamento"
-                    [(ngModel)]="previsione.nomeAppartamento"
-                    required
-                    #nomeAppartamento="ngModel"
-                  />
-                  @if ((nomeAppartamento.invalid && (nomeAppartamento.touched || form.submitted))) {
+                  <input matInput name="nomeAppartamento" [(ngModel)]="previsione.nomeAppartamento" required #nomeAppartamento="ngModel" />
+                  @if (nomeAppartamento.invalid && (nomeAppartamento.touched || form.submitted)) {
                     <mat-error>Campo obbligatorio</mat-error>
                   }
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" class="col-2">
+                <mat-form-field appearance="outline" class="span-2">
                   <mat-label>Indirizzo</mat-label>
-                  <input
-                    matInput
-                    type="text"
-                    name="indirizzo"
-                    [(ngModel)]="previsione.indirizzo"
-                    required
-                    #indirizzo="ngModel"
-                  />
-                  @if ((indirizzo.invalid && (indirizzo.touched || form.submitted))) {
+                  <input matInput name="indirizzo" [(ngModel)]="previsione.indirizzo" required #indirizzo="ngModel" />
+                  @if (indirizzo.invalid && (indirizzo.touched || form.submitted)) {
                     <mat-error>Campo obbligatorio</mat-error>
                   }
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                   <mat-label>Numero locali</mat-label>
-                  <input
-                    matInput
-                    type="number"
-                    name="numeroLocali"
-                    [(ngModel)]="previsione.numeroLocali"
-                    required
-                    min="1"
-                    step="1"
-                    #numeroLocali="ngModel"
-                  />
-                  @if ((numeroLocali.invalid && (numeroLocali.touched || form.submitted))) {
-                    <mat-error>Deve essere almeno 1</mat-error>
-                  }
+                  <input matInput type="number" name="numeroLocali" [(ngModel)]="previsione.numeroLocali" required min="1" step="1" />
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                   <mat-label>Numero bagni</mat-label>
-                  <input
-                    matInput
-                    type="number"
-                    name="numeroBagni"
-                    [(ngModel)]="previsione.numeroBagni"
-                    required
-                    min="1"
-                    step="1"
-                    #numeroBagni="ngModel"
-                  />
-                  @if ((numeroBagni.invalid && (numeroBagni.touched || form.submitted))) {
-                    <mat-error>Deve essere almeno 1</mat-error>
-                  }
+                  <input matInput type="number" name="numeroBagni" [(ngModel)]="previsione.numeroBagni" required min="1" step="1" />
                 </mat-form-field>
               </div>
-            </mat-card>
+            </div>
 
-            <mat-card class="subcard">
-              <mat-card-title class="subcard-title">Prenotazioni</mat-card-title>
+            <div class="section">
+              <div class="section-title">
+                <mat-icon>event</mat-icon>
+                <span>Prenotazioni</span>
+              </div>
 
-              <div class="grid-2">
+              <div class="info-grid">
                 <mat-form-field appearance="outline">
-                  <mat-label>Numero prenotazioni mensili</mat-label>
-                  <input
-                    matInput
-                    type="number"
-                    name="numeroPrenotazioni"
-                    [(ngModel)]="previsione.numeroPrenotazioni"
-                    required
-                    min="0"
-                    step="1"
-                    #numeroPrenotazioni="ngModel"
-                  />
-                  @if ((numeroPrenotazioni.invalid && (numeroPrenotazioni.touched || form.submitted))) {
-                    <mat-error>Campo obbligatorio</mat-error>
-                  }
+                  <mat-label>Prenotazioni mensili</mat-label>
+                  <input matInput type="number" name="numeroPrenotazioni" [(ngModel)]="previsione.numeroPrenotazioni" required min="0" step="1" />
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
-                  <mat-label>Notti mensili totali</mat-label>
-                  <input
-                    matInput
-                    type="number"
-                    name="numeroNottiMensili"
-                    [(ngModel)]="previsione.numeroNottiMensili"
-                    required
-                    min="0"
-                    step="1"
-                    #numeroNottiMensili="ngModel"
-                  />
-                  @if ((numeroNottiMensili.invalid && (numeroNottiMensili.touched || form.submitted))) {
-                    <mat-error>Campo obbligatorio</mat-error>
-                  }
+                  <mat-label>Notti mensili</mat-label>
+                  <input matInput type="number" name="numeroNottiMensili" [(ngModel)]="previsione.numeroNottiMensili" required min="0" step="1" />
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" class="col-2">
+                <mat-form-field appearance="outline" class="span-2">
                   <mat-label>Prezzo medio per notte</mat-label>
                   <span matTextPrefix>€&nbsp;</span>
-                  <input
-                    matInput
-                    type="number"
-                    name="prezzoMedioPerNotte"
-                    [(ngModel)]="previsione.prezzoMedioPerNotte"
-                    required
-                    min="0"
-                    step="1"
-                    #prezzoMedioPerNotte="ngModel"
-                  />
-                  @if ((prezzoMedioPerNotte.invalid && (prezzoMedioPerNotte.touched || form.submitted))) {
-                    <mat-error>Campo obbligatorio</mat-error>
-                  }
+                  <input matInput type="number" name="prezzoMedioPerNotte" [(ngModel)]="previsione.prezzoMedioPerNotte" required min="0" step="1" />
                 </mat-form-field>
               </div>
-            </mat-card>
+            </div>
 
           </div>
 
-          <!-- COLONNA DESTRA -->
+          <!-- COLONNA B -->
           <div class="col">
 
-            <mat-card class="subcard">
-              <mat-card-title class="subcard-title">Costi fissi</mat-card-title>
+            <div class="section">
+              <div class="section-title">
+                <mat-icon>receipt_long</mat-icon>
+                <span>Costi proprietario</span>
+              </div>
 
-              <div class="grid-3">
+              <div class="info-grid">
                 <mat-form-field appearance="outline">
-                  <mat-label>Mutuo / Affitto mensile</mat-label>
+                  <mat-label>Mutuo / Affitto</mat-label>
                   <span matTextPrefix>€&nbsp;</span>
                   <input matInput type="number" name="mutuoAffitto" [(ngModel)]="previsione.mutuoAffitto" min="0" step="1" />
                 </mat-form-field>
@@ -175,157 +177,103 @@
                   <input matInput type="number" name="costoUtenzeMensili" [(ngModel)]="previsione.costoUtenzeMensili" min="0" step="1" />
                 </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                  <mat-label>Costo pulizia per soggiorno</mat-label>
+                <mat-form-field appearance="outline" class="span-2">
+                  <mat-label>Pulizia per soggiorno</mat-label>
                   <span matTextPrefix>€&nbsp;</span>
                   <input matInput type="number" name="costoPulizia" [(ngModel)]="previsione.costoPulizia" min="0" step="1" />
                 </mat-form-field>
               </div>
-            </mat-card>
+            </div>
 
-            <!-- GESTIONE -->
-            <mat-card class="subcard">
-              <mat-card-title class="subcard-title">Gestione</mat-card-title>
+            <div class="section">
+              <div class="section-title">
+                <mat-icon>manage_accounts</mat-icon>
+                <span>Gestione</span>
+              </div>
 
-              <!-- Di default: SOLO select. Gli altri campi compaiono in base alla scelta -->
-              <div class="grid-2">
-                <mat-form-field appearance="outline" class="col-2">
+              <div class="info-grid">
+                <mat-form-field appearance="outline" class="span-2">
                   <mat-label>Tipo gestione</mat-label>
                   <mat-select
                     name="tipoGestione"
                     [(ngModel)]="previsione.tipoGestione"
                     required
                     (selectionChange)="onTipoGestioneChange()"
-                    #tipoGestione="ngModel"
+                    [disableOptionCentering]="true"
                   >
                     <mat-option value="">Seleziona</mat-option>
                     <mat-option value="diretta">Diretta</mat-option>
                     <mat-option value="cohost">Co-host</mat-option>
                   </mat-select>
-
-                  @if ((tipoGestione.invalid && (tipoGestione.touched || form.submitted))) {
-                    <mat-error>Seleziona un tipo gestione</mat-error>
-                  }
                 </mat-form-field>
 
-                <!-- Se NON ho scelto nulla: non mostrare altro -->
                 @if (previsione.tipoGestione === 'cohost') {
-                  <!-- Host + CoHost sulla stessa riga -->
                   <mat-form-field appearance="outline">
                     <mat-label>Commissione Host</mat-label>
                     <span matTextSuffix>%</span>
-                    <input
-                      matInput
-                      type="number"
-                      name="commissioneHost"
-                      [(ngModel)]="previsione.commissioneHost"
-                      min="0"
-                      max="100"
-                      step="1"
-                      (ngModelChange)="ricalcolaTotaleGestione()"
-                    />
+                    <input matInput type="number" name="commissioneHost" [(ngModel)]="previsione.commissioneHost"
+                           min="0" max="100" step="1" (ngModelChange)="ricalcolaTotaleGestione()" />
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
                     <mat-label>Commissione Co-Host</mat-label>
                     <span matTextSuffix>%</span>
-                    <input
-                      matInput
-                      type="number"
-                      name="commissioneCoHost"
-                      [(ngModel)]="previsione.commissioneCoHost"
-                      min="0"
-                      max="100"
-                      step="1"
-                      (ngModelChange)="ricalcolaTotaleGestione()"
-                    />
+                    <input matInput type="number" name="commissioneCoHost" [(ngModel)]="previsione.commissioneCoHost"
+                           min="0" max="100" step="1" (ngModelChange)="ricalcolaTotaleGestione()" />
                   </mat-form-field>
 
-                  <!-- NON MOSTRO più commissioneGestioneTotale -->
+                  <div class="inline-kpi span-2">
+                    <div class="inline-label">Totale gestione</div>
+                    <div class="inline-value">{{ previsione.commissioneGestioneTotale }}%</div>
+                  </div>
                 }
 
                 @if (previsione.tipoGestione === 'diretta') {
-                  <!-- Solo commissione totale gestione -->
-                  <mat-form-field appearance="outline" class="col-2">
+                  <mat-form-field appearance="outline" class="span-2">
                     <mat-label>Commissione totale gestione</mat-label>
                     <span matTextSuffix>%</span>
-                    <input
-                      matInput
-                      type="number"
-                      name="commissioneGestioneTotale"
-                      [(ngModel)]="previsione.commissioneGestioneTotale"
-                      min="0"
-                      max="100"
-                      step="1"
-                    />
+                    <input matInput type="number" name="commissioneGestioneTotale" [(ngModel)]="previsione.commissioneGestioneTotale"
+                           min="0" max="100" step="1" />
                   </mat-form-field>
                 }
               </div>
-            </mat-card>
-           
-            <mat-card class="subcard">
-              <mat-card-title class="subcard-title">Tasse e piattaforma</mat-card-title>
+            </div>
 
-              <div class="grid-2">
+            <div class="section">
+              <div class="section-title">
+                <mat-icon>percent</mat-icon>
+                <span>Tasse e piattaforma</span>
+              </div>
+
+              <div class="info-grid">
                 <mat-form-field appearance="outline">
-                  <mat-label>Costi tasse</mat-label>
-                  <input
-                    matInput
-                    type="number"
-                    name="costoTasse"
-                    [(ngModel)]="previsione.costoTasse"
-                    required
-                    min="0"
-                    max="100"
-                    step="1"
-                    #costoTasse="ngModel"
-                  />
+                  <mat-label>Tasse</mat-label>
+                  <input matInput type="number" name="costoTasse" [(ngModel)]="previsione.costoTasse" required min="0" max="100" step="1" />
                   <span matTextSuffix>%</span>
-                  @if ((costoTasse.invalid && (costoTasse.touched || form.submitted))) {
-                    <mat-error>Campo obbligatorio</mat-error>
-                  }
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
-                  <mat-label>Costi piattaforma</mat-label>
-                  <input
-                    matInput
-                    type="number"
-                    name="costoPiattaforma"
-                    [(ngModel)]="previsione.costoPiattaforma"
-                    required
-                    min="0"
-                    max="100"
-                    step="1"
-                    #costoPiattaforma="ngModel"
-                  />
+                  <mat-label>Piattaforma</mat-label>
+                  <input matInput type="number" name="costoPiattaforma" [(ngModel)]="previsione.costoPiattaforma" required min="0" max="100" step="1" />
                   <span matTextSuffix>%</span>
-                  @if ((costoPiattaforma.invalid && (costoPiattaforma.touched || form.submitted))) {
-                    <mat-error>Campo obbligatorio</mat-error>
-                  }
                 </mat-form-field>
               </div>
-            </mat-card>
+            </div>
 
           </div>
         </div>
 
-        <!-- AZIONI -->
-        <div class="actions">
-          <button
-            mat-stroked-button
-            type="button"
-            (click)="resetForm(form)"
-            [disabled]="loading"
-          >
+        <div class="footer">
+          <button mat-stroked-button class="btn-gold" type="button" (click)="resetForm(form)" [disabled]="loading">
             Reset
           </button>
 
           <button
             mat-raised-button
-            color="primary"
+            class="btn-gold"
             type="submit"
             [disabled]="form.invalid || loading"
+            [class.is-disabled]="form.invalid || loading"
           >
             <mat-icon>calculate</mat-icon>
             Calcola previsione
@@ -333,63 +281,110 @@
         </div>
 
       </form>
-    </mat-card-content>
-  </mat-card>
-}
+    </div>
+  }
 
-<!-- RISULTATI: mostrati solo se ho risultato -->
-@if (risultato) {
-  <mat-card class="results">
-    <mat-card-header>
-      <mat-card-title>Risultati previsione</mat-card-title>
-      <mat-card-subtitle>{{ previsione.nomeAppartamento }} — {{ previsione.indirizzo }}</mat-card-subtitle>
-    </mat-card-header>
+  <!-- RISULTATI -->
+  @if (risultato) {
+    <div class="content">
 
-    <mat-card-content>
-      <div class="results-grid">
-        <div class="kpi">
+      <div class="kpi-row">
+        <div class="kpi-card">
           <div class="kpi-label">Lordo pernottamenti</div>
-          <div class="kpi-value">€ {{ risultato.totaleLordoPernottamenti }}</div>
+          <div class="kpi-value">{{ risultato.totaleLordoPernottamenti | currency:'EUR' }}</div>
+          <div class="kpi-hint">
+            {{ previsione.prezzoMedioPerNotte | currency:'EUR' }} × {{ previsione.numeroNottiMensili }} notti
+          </div>
         </div>
 
-        <div class="kpi">
-          <div class="kpi-label">Costo pulizie</div>
-          <div class="kpi-value">€ {{ risultato.totaleCostoPulizia }}</div>
-        </div>
-
-        <div class="kpi">
-          <div class="kpi-label">Costo tasse</div>
-          <div class="kpi-value">€ {{ risultato.totaleCostoTassa }}</div>
-        </div>
-
-        <div class="kpi">
-          <div class="kpi-label">Costo piattaforma</div>
-          <div class="kpi-value">€ {{ risultato.totaleCostoPiattaforma }}</div>
-        </div>
-
-        <div class="kpi">
-          <div class="kpi-label">Commissione Host</div>
-          <div class="kpi-value">€ {{ risultato.totaleCommissioneHost }}</div>
-        </div>
-
-        <div class="kpi">
-          <div class="kpi-label">Commissione Co-Host</div>
-          <div class="kpi-value">€ {{ risultato.totaleCommissioneCoHost }}</div>
-        </div>
-
-        <div class="kpi highlight">
+        <div class="kpi-card highlight" [ngClass]="isProfit ? 'profit' : 'loss'">
           <div class="kpi-label">Netto proprietario</div>
-          <div class="kpi-value">€ {{ risultato.totaleNettoProprietario }}</div>
+          <div class="kpi-value">{{ risultato.totaleNettoProprietario | currency:'EUR' }}</div>
+          <div class="kpi-hint">Include: tasse, piattaforma, gestione, pulizie, utenze, mutuo/affitto</div>
         </div>
       </div>
 
-      <div class="actions results-actions">
-        <button mat-stroked-button type="button" (click)="nuovoCalcolo()">
+      <!-- COSTI PROPRIETARIO -->
+      <div class="section">
+        <div class="section-title">
+          <mat-icon>receipt</mat-icon>
+          <span>Costi proprietario</span>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card owner-cost">
+            <div class="label">Mutuo / Affitto</div>
+            <div class="value">{{ previsione.mutuoAffitto | currency:'EUR' }}</div>
+            <div class="hint">Costo mensile fisso</div>
+          </div>
+
+          <div class="info-card owner-cost">
+            <div class="label">Utenze mensili</div>
+            <div class="value">{{ previsione.costoUtenzeMensili | currency:'EUR' }}</div>
+            <div class="hint">Costo mensile fisso</div>
+          </div>
+
+          <div class="info-card owner-cost span-2">
+            <div class="label">Pulizie</div>
+            <div class="value">{{ risultato.totaleCostoPulizia | currency:'EUR' }}</div>
+            <div class="hint">
+              {{ previsione.costoPulizia | currency:'EUR' }} × {{ previsione.numeroPrenotazioni }} prenotazioni
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DETTAGLIO COSTI & COMMISSIONI -->
+      <div class="section">
+        <div class="section-title">
+          <mat-icon>calculate</mat-icon>
+          <span>Dettaglio costi e commissioni</span>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="label">Costo tasse</div>
+            <div class="value">{{ risultato.totaleCostoTassa | currency:'EUR' }}</div>
+            <div class="hint">{{ previsione.costoTasse }}% su lordo</div>
+          </div>
+
+          <div class="info-card">
+            <div class="label">Costo piattaforma</div>
+            <div class="value">{{ risultato.totaleCostoPiattaforma | currency:'EUR' }}</div>
+            <div class="hint">{{ previsione.costoPiattaforma }}% su lordo</div>
+          </div>
+
+          <div class="info-card">
+            <div class="label">Lordo gestione</div>
+            <div class="value">{{ risultato.totaleLordoGestione | currency:'EUR' }}</div>
+            <div class="hint">{{ previsione.commissioneGestioneTotale }}% su base</div>
+          </div>
+
+          <!-- Se CO-HOST > 0 -> mostra Host + CoHost -->
+          @if (showHostSplit) {
+            <div class="info-card">
+              <div class="label">Commissione Host</div>
+              <div class="value">{{ risultato.totaleCommissioneHost | currency:'EUR' }}</div>
+              <div class="hint">{{ previsione.commissioneHost }}%</div>
+            </div>
+
+            <div class="info-card">
+              <div class="label">Commissione Co-Host</div>
+              <div class="value">{{ risultato.totaleCommissioneCoHost | currency:'EUR' }}</div>
+              <div class="hint">{{ previsione.commissioneCoHost }}%</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="footer">
+        <button mat-stroked-button class="btn-gold" type="button" (click)="nuovoCalcolo()">
           <mat-icon>edit</mat-icon>
           Nuovo calcolo
         </button>
       </div>
-    </mat-card-content>
-  </mat-card>
-}
 
+    </div>
+  }
+
+</div>

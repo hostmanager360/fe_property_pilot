@@ -3,7 +3,9 @@ import { AuthGuard } from './auth/auth.guard';
 import { RoleGuard } from './auth/role.guard';
 import { OnboardingGuard } from './auth/OnboardingGuard';
 
-// Rotte pubbliche (senza layout principale)
+/* -------------------------------------------------------
+   ROTTE PUBBLICHE (senza layout principale)
+------------------------------------------------------- */
 const publicRoutes: Routes = [
   {
     path: '',
@@ -24,7 +26,9 @@ const publicRoutes: Routes = [
   },
 ];
 
-// Rotte di onboarding / first access (protette ma senza layout principale)
+/* -------------------------------------------------------
+   ROTTE ONBOARDING (protette ma senza layout principale)
+------------------------------------------------------- */
 const onboardingRoutes: Routes = [
   {
     path: 'tenant-first-access',
@@ -42,7 +46,9 @@ const onboardingRoutes: Routes = [
   },
 ];
 
-// Rotte protette con layout principale
+/* -------------------------------------------------------
+   ROTTE PROTETTE CON LAYOUT PRINCIPALE
+------------------------------------------------------- */
 const protectedWithLayoutRoutes: Routes = [
   {
     path: '',
@@ -50,18 +56,28 @@ const protectedWithLayoutRoutes: Routes = [
       import('./layout/main-layout/main-layout').then(m => m.MainLayout),
     canActivate: [AuthGuard, OnboardingGuard],
     children: [
-      {
-        path: 'registration',
-        loadComponent: () =>
-          import('./auth/registrationComponent/registration')
-            .then(m => m.RegistrationComponent),
-      },
+
+      /* HOME */
       {
         path: 'home',
         loadComponent: () =>
-          import('./components/home/home')
-            .then(m => m.HomeComponent),
+          import('./components/home/home').then(m => m.HomeComponent),
       },
+
+      /* LISTA PREVISIONI (NUOVA PAGINA) */
+      {
+        path: 'previsioniList',
+        loadComponent: () =>
+          import('./components/previsioni-list-component/previsioni-list-component/previsioni-list-component')
+            .then(m => m.PrevisioniListComponent),
+        canActivate: [RoleGuard],
+        data: {
+          allowedRoles: [1, 2],
+          feature: 'previsione-guadagno-list',
+        },
+      },
+
+      /* PAGINA / COMPONENTE DI DETTAGLIO (popup o pagina) */
       {
         path: 'previsione',
         loadComponent: () =>
@@ -69,10 +85,20 @@ const protectedWithLayoutRoutes: Routes = [
             .then(m => m.PrevisioneGuadagno),
         canActivate: [RoleGuard],
         data: {
-          allowedRoles: [1, 2], // 1 = OWNER, 2 = ADMIN (esempio)
+          allowedRoles: [1, 2],
           feature: 'previsione-guadagno',
         },
       },
+
+      /* REGISTRAZIONE */
+      {
+        path: 'registration',
+        loadComponent: () =>
+          import('./auth/registrationComponent/registration')
+            .then(m => m.RegistrationComponent),
+      },
+
+      /* NOT AUTHORIZED */
       {
         path: 'not-authorized',
         loadComponent: () =>
@@ -83,7 +109,9 @@ const protectedWithLayoutRoutes: Routes = [
   },
 ];
 
-// Configurazione principale delle rotte
+/* -------------------------------------------------------
+   ROUTING PRINCIPALE
+------------------------------------------------------- */
 export const routes: Routes = [
   ...publicRoutes,
   ...onboardingRoutes,
